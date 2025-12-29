@@ -72,3 +72,16 @@ alter table results add column if not exists roll_number text;
 insert into tests (name, description, duration, is_active)
 values ('Java MCQ Quiz', 'Test your Java programming knowledge', 10, true)
 on conflict do nothing;
+
+-- Admin Users Table (for admin authentication)
+create table if not exists admin_users (
+  id uuid default uuid_generate_v4() primary key,
+  username text unique not null,
+  password text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Insert default admin user
+insert into admin_users (username, password)
+values ('kalai', 'kalai100')
+on conflict (username) do nothing;

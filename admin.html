@@ -685,63 +685,7 @@
             }
         }
 
-        // === QUESTIONS ===
-        async function loadQuestions() {
-            try {
-                const response = await fetch(getApiUrl('/api/questions'));
-                if (response.ok) {
-                    questions = await response.json();
-                    renderQuestions();
-                }
-            } catch (e) {
-                document.getElementById('questionsList').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Server not running</div>';
-            }
-        }
-
-        async function saveQuestionsToServer() {
-            try {
-                const token = sessionStorage.getItem('authToken');
-                const response = await fetch(getApiUrl('/api/questions'), {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token
-                    },
-                    body: JSON.stringify(questions)
-                });
-                return response.ok;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function renderQuestions() {
-            document.getElementById('questionCount').textContent = questions.length;
-            const container = document.getElementById('questionsList');
-
-            if (questions.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">No questions yet</div>';
-                return;
-            }
-
-            container.innerHTML = questions.map((q, i) => `
-                <div class="list-item">
-                    <div class="item-header">
-                        <div class="item-title">Q${i + 1}: ${q.question}</div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="editQuestion(${i})">✏️</button>
-                            <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteQuestion(${i})">🗑️</button>
-                        </div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem;">
-                        <div class="option-preview ${q.answer === 'A' ? 'correct' : ''}">A. ${q.options.A}</div>
-                        <div class="option-preview ${q.answer === 'B' ? 'correct' : ''}">B. ${q.options.B}</div>
-                        <div class="option-preview ${q.answer === 'C' ? 'correct' : ''}">C. ${q.options.C}</div>
-                        <div class="option-preview ${q.answer === 'D' ? 'correct' : ''}">D. ${q.options.D}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
+        // === QUESTIONS (Managed via Test Manager) ===
 
         async function saveQuestion() {
             const questionText = document.getElementById('questionText').value.trim();

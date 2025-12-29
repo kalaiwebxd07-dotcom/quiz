@@ -420,15 +420,9 @@ async function loadQuestions(testId = null) {
         const url = testId ? getApiUrl(`/api/questions?test_id=${testId}`) : getApiUrl('/api/questions');
         const response = await fetch(url);
         quiz = await response.json();
-        const settings = await loadSettings(); // Fallback if test has no duration
-        if (settings) {
-            // Keep specialized test duration if passed in startQuiz
-        }
-        if (document.getElementById('testShuffle') && document.getElementById('testShuffle').checked) {
-            shuffle(quiz);
-        } else {
-            shuffle(quiz); // Default shuffle
-        }
+
+        // Shuffle questions by default
+        shuffle(quiz);
     } catch (e) {
         console.error('Failed to load questions', e);
         quiz = [];
@@ -499,20 +493,31 @@ function loadQuestion() {
     const progress = ((currentQuestion + 1) / quiz.length) * 100;
     document.getElementById('progressFill').style.width = progress + '%';
 
-    // Render options
+    // Render options with modern styling
     const optionsContainer = document.getElementById('options');
     const options = q.options;
+    const isSelected = key => responses[currentQuestion] === key;
+
     optionsContainer.innerHTML = Object.entries(options).map(([key, value]) => `
-        <button class="lms-btn option-btn ${responses[currentQuestion] === key ? 'selected' : ''}" 
+        <button class="quiz-option ${isSelected(key) ? 'selected' : ''}" 
                 onclick="selectOption('${key}')"
-                style="text-align: left; padding: 1rem; background: ${responses[currentQuestion] === key ? 'var(--lms-primary)' : '#f5f5f5'}; color: ${responses[currentQuestion] === key ? 'white' : 'inherit'}; border: 1px solid var(--lms-border);">
-            <strong>${key}.</strong> ${value}
+                style="display: flex; align-items: center; gap: 1rem; width: 100%; padding: 1.25rem 1.5rem; 
+                       border: 2px solid ${isSelected(key) ? 'var(--lms-primary)' : 'var(--lms-border)'}; 
+                       border-radius: 14px; cursor: pointer; transition: all 0.3s ease; text-align: left;
+                       background: ${isSelected(key) ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)' : 'white'};">
+            <span style="display: flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; 
+                         border-radius: 50%; font-weight: 700; font-size: 1rem; flex-shrink: 0;
+                         background: ${isSelected(key) ? 'linear-gradient(135deg, var(--lms-primary) 0%, #8b5cf6 100%)' : 'rgba(0,0,0,0.05)'};
+                         color: ${isSelected(key) ? 'white' : 'var(--lms-text-muted)'};">
+                ${key}
+            </span>
+            <span style="font-size: 1rem; color: var(--lms-text);">${value}</span>
         </button>
     `).join('');
 
     // Update nav buttons
     document.getElementById('prevBtn').style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
-    document.getElementById('nextBtn').textContent = currentQuestion === quiz.length - 1 ? 'Finish Quiz' : 'Next →';
+    document.getElementById('nextBtn').innerHTML = currentQuestion === quiz.length - 1 ? '🏁 Finish Quiz' : 'Next →';
 }
 
 function selectOption(key) {
@@ -553,7 +558,8 @@ function startTimer() {
 function updateTimerDisplay() {
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
-    document.getElementById('timer').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const timerEl = document.getElementById('timerDisplay') || document.getElementById('timer');
+    if (timerEl) timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 async function finishQuiz() {
