@@ -8,502 +8,338 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="color.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .field-error {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            min-height: 1rem;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            padding: 20px;
-        }
-
-        @keyframes gradientShift {
-
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 15px 25px;
-            font-size: 1rem;
+        .correct-answer {
+            color: #22c55e !important;
             font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s;
         }
 
-        .tab-btn.active {
-            background: white;
-            color: #764ba2;
-        }
-
-        .tab-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
+        @keyframes slideIn {
             from {
+                transform: translateX(100%);
                 opacity: 0;
-                transform: translateY(10px);
             }
 
             to {
+                transform: translateX(0);
                 opacity: 1;
-                transform: translateY(0);
             }
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            color: white;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            display: block;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #06b6d4;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* List Items */
-        .list-item {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 4px solid #06b6d4;
-        }
-
-        .list-item.wrong {
-            border-left-color: #ef4444;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .item-title {
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .item-meta {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .item-actions button {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border-radius: 6px;
-        }
-
-        .options-preview {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .option-preview {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .option-preview.correct {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-        }
-
-        .result-item {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .result-name {
-            color: white;
-            font-weight: 600;
-        }
-
-        .result-score {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .result-score.high {
-            background: rgba(16, 185, 129, 0.3);
-            color: #10b981;
-        }
-
-        .result-score.medium {
-            background: rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-        }
-
-        .result-score.low {
-            background: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-
-        .result-meta {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Sort Buttons */
-        .sort-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .sort-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .sort-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .sort-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        .sort-btn.active {
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .sort-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-        }
-
-        .sort-icon {
-            font-size: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .sort-btn:hover .sort-icon {
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 600px) {
-
-            .form-grid,
-            .options-preview,
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
+        textarea {
+            font-family: inherit;
         }
     </style>
 </head>
 
 <body>
     <div class="admin-container">
-        <div class="header">
+        <div class="nav-header">
             <h1>⚙️ Admin Panel</h1>
-            <div class="nav-links">
-                <a href="index.html">🎮 Take Quiz</a>
-                <a href="#" onclick="logout()">🚪 Logout</a>
+            <div class="admin-nav">
+                <a href="index.html" class="btn btn-secondary">🎮 Take Quiz</a>
+                <button onclick="logout()" class="btn btn-danger">🚪 Logout</button>
             </div>
         </div>
 
         <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('questions')">📝 Question Manager</button>
+        <div style="border-bottom: 1px solid var(--border); margin-bottom: 2rem; display: flex; gap: 1rem;">
+            <button class="tab-btn active" onclick="showTab('tests')">📋 Test Manager</button>
+            <button class="tab-btn" onclick="showTab('students')">🎓 Student Manager</button>
             <button class="tab-btn" onclick="showTab('results')">📊 Results Manager</button>
             <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
         </div>
 
-        <!-- Question Manager Tab -->
-        <div id="questionsTab" class="tab-content active">
-            <!-- Add/Edit Form -->
-            <div class="card">
-                <div class="card-title" id="formTitle">➕ Add New Question</div>
-                <div class="form-group full-width">
-                    <label>Question</label>
-                    <input type="text" id="questionText" placeholder="Enter your question...">
+        <!-- Test Manager Tab -->
+        <div id="testsTab" class="tab-content active" style="display: block;">
+            <!-- Test List -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.25rem;">📋 Tests</h2>
+                    <button class="btn btn-primary" onclick="showTestForm()">➕ Create New Test</button>
                 </div>
+                <div id="testsList"></div>
+            </div>
+
+            <!-- Test Form (Hidden by default) -->
+            <div id="testFormCard" class="card" style="margin-bottom: 2rem; display: none;">
+                <h2 id="testFormTitle" style="margin-bottom: 1.5rem; font-size: 1.25rem;">➕ Create New Test</h2>
+
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>Option A</label>
-                        <input type="text" id="optionA" placeholder="Option A">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Test
+                            Name</label>
+                        <input type="text" id="testName" placeholder="e.g., Java Fundamentals Quiz">
                     </div>
-                    <div class="form-group">
-                        <label>Option B</label>
-                        <input type="text" id="optionB" placeholder="Option B">
-                    </div>
-                    <div class="form-group">
-                        <label>Option C</label>
-                        <input type="text" id="optionC" placeholder="Option C">
-                    </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        <input type="text" id="optionD" placeholder="Option D">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Duration
+                            (minutes)</label>
+                        <input type="number" id="testDuration" placeholder="10" min="1" max="180" value="10">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Correct Answer</label>
-                    <select id="correctAnswer">
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                    </select>
+
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Description</label>
+                    <input type="text" id="testDescription" placeholder="Brief description of the test">
                 </div>
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="saveBtn" onclick="saveQuestion()">💾 Save Question</button>
-                    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()"
-                        style="display:none;">Cancel</button>
-                    <button class="btn btn-primary" onclick="generateWithAI()">🤖 Generate with AI</button>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1rem;">📅 Scheduling</h3>
+                <div class="form-grid">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Start Date &
+                            Time</label>
+                        <input type="datetime-local" id="testStartDate">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">End Date &
+                            Time</label>
+                        <input type="datetime-local" id="testEndDate">
+                    </div>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">Leave empty for always
+                    available</small>
+
+                <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1rem;">⚙️ Options</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="testShuffle" checked> Shuffle Questions
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="testShowResults" checked> Show Results Immediately
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="testActive" checked> Active
+                    </label>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Max Attempts (0 =
+                        unlimited)</label>
+                    <input type="number" id="testMaxAttempts" placeholder="0" min="0" value="0"
+                        style="max-width: 100px;">
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="saveTest()">💾 Save Test</button>
+                    <button class="btn btn-secondary" onclick="hideTestForm()">Cancel</button>
                 </div>
             </div>
 
-            <!-- Questions List -->
-            <div class="card">
-                <div class="card-title">📋 Questions (<span id="questionCount">0</span>)</div>
+            <!-- Question Manager for Selected Test -->
+            <div id="questionManagerCard" class="card" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.25rem;">📝 Questions for: <span id="selectedTestName">Test</span></h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="showBulkImport()">📁 Bulk Import</button>
+                        <button class="btn btn-secondary" onclick="hideQuestionManager()">← Back to Tests</button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Add Question Form -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <!-- Left: Form -->
+                    <div
+                        style="background: var(--bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 id="questionFormTitle" style="font-size: 1rem; margin: 0;">➕ Add Question</h3>
+                            <select id="questionTemplate" onchange="applyTemplate()"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <option value="">📋 Templates</option>
+                                <option value="basic">Basic MCQ</option>
+                                <option value="code">Code Question</option>
+                                <option value="truefalse">True/False</option>
+                            </select>
+                        </div>
+
+                        <input type="hidden" id="editingTestId">
+                        <input type="hidden" id="editingQuestionId">
+
+                        <!-- Question Text -->
+                        <div style="margin-bottom: 1rem;">
+                            <label
+                                style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Question
+                                *</label>
+                            <textarea id="questionText" placeholder="Enter your question..." rows="2"
+                                oninput="updatePreview()" style="width: 100%; resize: vertical;"></textarea>
+                            <div id="questionTextError" class="field-error"></div>
+                        </div>
+
+                        <!-- Difficulty Selector -->
+                        <div style="margin-bottom: 1rem;">
+                            <label
+                                style="display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">Difficulty</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="difficulty-btn active" data-difficulty="easy"
+                                    onclick="setDifficulty('easy')"
+                                    style="flex: 1; padding: 0.5rem; border: 2px solid #22c55e; background: rgba(34, 197, 94, 0.1); color: #22c55e; border-radius: 8px; cursor: pointer; font-weight: 600;">🟢
+                                    Easy</button>
+                                <button type="button" class="difficulty-btn" data-difficulty="medium"
+                                    onclick="setDifficulty('medium')"
+                                    style="flex: 1; padding: 0.5rem; border: 2px solid #eab308; background: transparent; color: #eab308; border-radius: 8px; cursor: pointer; font-weight: 600;">🟡
+                                    Medium</button>
+                                <button type="button" class="difficulty-btn" data-difficulty="hard"
+                                    onclick="setDifficulty('hard')"
+                                    style="flex: 1; padding: 0.5rem; border: 2px solid #ef4444; background: transparent; color: #ef4444; border-radius: 8px; cursor: pointer; font-weight: 600;">🔴
+                                    Hard</button>
+                            </div>
+                            <input type="hidden" id="selectedDifficulty" value="easy">
+                        </div>
+
+                        <!-- Options -->
+                        <div class="form-grid" style="margin-bottom: 1rem;">
+                            <div>
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.85rem;">Option
+                                    A *</label>
+                                <input type="text" id="optionA" placeholder="Option A" oninput="updatePreview()">
+                                <div id="optionAError" class="field-error"></div>
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.85rem;">Option
+                                    B *</label>
+                                <input type="text" id="optionB" placeholder="Option B" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.85rem;">Option
+                                    C *</label>
+                                <input type="text" id="optionC" placeholder="Option C" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; margin-bottom: 0.25rem; color: var(--text-muted); font-size: 0.85rem;">Option
+                                    D *</label>
+                                <input type="text" id="optionD" placeholder="Option D" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <!-- Code Snippet (Collapsible) -->
+                        <details style="margin-bottom: 1rem;">
+                            <summary
+                                style="cursor: pointer; color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                💻 Add Code Snippet (Optional)</summary>
+                            <div style="margin-top: 0.5rem;">
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <select id="codeLanguage" style="padding: 0.25rem 0.5rem; font-size: 0.85rem;">
+                                        <option value="java">Java</option>
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="python">Python</option>
+                                        <option value="c">C</option>
+                                        <option value="cpp">C++</option>
+                                        <option value="sql">SQL</option>
+                                    </select>
+                                </div>
+                                <textarea id="codeSnippet" placeholder="// Paste your code here..." rows="4"
+                                    oninput="updatePreview()"
+                                    style="width: 100%; font-family: monospace; font-size: 0.85rem; background: #1e1e1e; color: #d4d4d4; border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem;"></textarea>
+                            </div>
+                        </details>
+
+                        <!-- Image URL (Collapsible) -->
+                        <details style="margin-bottom: 1rem;">
+                            <summary
+                                style="cursor: pointer; color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                🖼️ Add Image (Optional)</summary>
+                            <div style="margin-top: 0.5rem;">
+                                <input type="url" id="imageUrl" placeholder="https://example.com/image.png"
+                                    oninput="updatePreview()">
+                            </div>
+                        </details>
+
+                        <!-- Correct Answer & Actions -->
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <div>
+                                <label style="margin-right: 0.5rem; color: var(--text-muted);">Correct Answer:</label>
+                                <select id="correctAnswer" style="padding: 0.5rem; min-width: 100px;"
+                                    onchange="updatePreview()">
+                                    <option value="A">Option A</option>
+                                    <option value="B">Option B</option>
+                                    <option value="C">Option C</option>
+                                    <option value="D">Option D</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="saveQuestion()">💾 Save Question</button>
+                            <button class="btn btn-secondary" id="cancelQuestionBtn" onclick="cancelEditQuestion()"
+                                style="display: none;">Cancel</button>
+                            <button class="btn btn-secondary" onclick="generateWithAI()" style="margin-left: auto;">🤖
+                                Generate with AI</button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Live Preview -->
+                    <div
+                        style="background: linear-gradient(135deg, var(--bg) 0%, var(--card-bg) 100%); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border);">
+                        <h3
+                            style="font-size: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            👁️ Live Preview
+                            <span id="previewDifficulty"
+                                style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(34, 197, 94, 0.2); color: #22c55e;">Easy</span>
+                        </h3>
+                        <div id="questionPreview" style="min-height: 200px;">
+                            <p style="color: var(--text-muted); font-style: italic;">Start typing to see preview...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Import Modal -->
+                <div id="bulkImportModal"
+                    style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                    <div
+                        style="background: var(--card-bg); padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h3 style="margin-bottom: 1rem;">📁 Bulk Import Questions</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">Upload a CSV file
+                            or paste JSON data</p>
+
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem;">CSV Format:</label>
+                            <code
+                                style="display: block; background: var(--bg); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; overflow-x: auto;">question,optionA,optionB,optionC,optionD,answer,difficulty</code>
+                        </div>
+
+                        <textarea id="bulkImportData" rows="8" placeholder="Paste CSV or JSON data here..."
+                            style="width: 100%; margin-bottom: 1rem;"></textarea>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-primary" onclick="processBulkImport()">Import Questions</button>
+                            <button class="btn btn-secondary" onclick="hideBulkImport()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions List -->
                 <div id="questionsList"></div>
             </div>
         </div>
 
+        <!-- Student Manager Tab -->
+        <div id="studentsTab" class="tab-content" style="display: none;">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1.5rem; text-align: left; font-size: 1.25rem;">➕ Add Student</h2>
+                <div class="form-grid">
+                    <input type="text" id="newStudentRoll" placeholder="Roll Number">
+                    <input type="text" id="newStudentName" placeholder="Full Name">
+                    <input type="password" id="newStudentPassword" placeholder="Password">
+                </div>
+                <button class="btn btn-primary" onclick="addStudent()" style="margin-top: 1rem;">Add Student</button>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 1.5rem; text-align: left; font-size: 1.25rem;">🎓 Students List</h2>
+                <div id="studentsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+            </div>
+        </div>
+
         <!-- Results Manager Tab -->
-        <div id="resultsTab" class="tab-content">
+        <div id="resultsTab" class="tab-content" style="display: none;">
             <!-- Stats -->
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
@@ -526,34 +362,29 @@
 
             <!-- Results List -->
             <div class="card">
-                <div class="card-title" style="flex-wrap: wrap; gap: 10px;">
-                    📊 All Results
-
-                    <div class="sort-controls" style="margin-left: auto; margin-bottom: 0;">
-                        <button class="sort-btn" id="sortAscBtn" onclick="sortResults('asc')">
-                            <span class="sort-icon">▲</span> Lowest
-                        </button>
-                        <button class="sort-btn active" id="sortDescBtn" onclick="sortResults('desc')">
-                            <span class="sort-icon">▼</span> Highest
-                        </button>
-                        <button class="btn btn-danger" style="padding: 8px 15px; font-size: 0.85rem;"
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.25rem;">📊 All Results</h2>
+                    <div class="sort-controls">
+                        <button class="sort-btn" id="sortAscBtn" onclick="sortResults('asc')">Lowest</button>
+                        <button class="sort-btn active" id="sortDescBtn" onclick="sortResults('desc')">Highest</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;"
                             onclick="clearAllResults()">🗑️ Clear All</button>
                     </div>
                 </div>
 
-                <div id="resultsList"></div>
+                <div id="resultsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
             </div>
         </div>
 
         <!-- Settings Tab -->
-        <div id="settingsTab" class="tab-content">
-            <div class="card">
-                <div class="card-title">⚙️ Quiz Settings</div>
-                <div class="form-group">
-                    <label>Quiz Duration (in minutes)</label>
+        <div id="settingsTab" class="tab-content" style="display: none;">
+            <div class="card" style="max-width: 600px; margin: 0 auto;">
+                <h2 style="margin-bottom: 1.5rem; text-align: left; font-size: 1.25rem;">⚙️ Quiz Settings</h2>
+                <div style="text-align: left; margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Quiz Duration (in minutes)</label>
                     <input type="number" id="quizDuration" placeholder="e.g. 10" min="1" max="120">
-                    <small style="color: rgba(255,255,255,0.5); display: block; margin-top: 5px;">
-                        Set the detailed time allowed for the entire quiz.
+                    <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                        Set the time allowed for the entire quiz.
                     </small>
                 </div>
                 <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
@@ -570,23 +401,242 @@
 
         function logout() {
             sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('authToken');
             window.location.href = 'login.html';
         }
 
         let questions = [];
         let results = { statistics: {}, results: [] };
         let editingIndex = -1;
-        let currentSortOrder = 'desc'; // Default sort order (highest scores first)
+        let currentSortOrder = 'desc';
+        let tests = [];
+        let currentTestId = null;
 
         // Tab switching
         function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.getElementById(tabName + 'Tab').style.display = 'block';
             event.target.classList.add('active');
 
             if (tabName === 'results') loadResults();
             if (tabName === 'settings') loadSettings();
+            if (tabName === 'students') loadStudents();
+            if (tabName === 'tests') loadTests();
+        }
+
+        // === TEST MANAGEMENT ===
+        async function loadTests() {
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl('/api/tests'), {
+                    headers: { 'Authorization': token }
+                });
+                if (response.ok) {
+                    tests = await response.json();
+                    renderTests();
+                }
+            } catch (e) {
+                console.error('Failed to load tests');
+            }
+        }
+
+        function renderTests() {
+            const container = document.getElementById('testsList');
+            if (tests.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No tests created yet. Click "Create New Test" to get started.</p>';
+                return;
+            }
+            container.innerHTML = tests.map(t => `
+                <div class="result-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600;">${t.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">
+                            ${t.description || 'No description'} • ${t.duration} min
+                            ${t.start_date ? ` • Starts: ${new Date(t.start_date).toLocaleDateString()}` : ' • Always available'}
+                            ${t.is_active ? '<span style="color: var(--success);">● Active</span>' : '<span style="color: var(--danger);">● Inactive</span>'}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem;" onclick="manageQuestions('${t.id}', '${t.name}')">📝 Questions</button>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem;" onclick="editTest('${t.id}')">✏️</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem 0.75rem;" onclick="deleteTest('${t.id}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showTestForm() {
+            document.getElementById('testFormCard').style.display = 'block';
+            document.getElementById('testFormTitle').textContent = '➕ Create New Test';
+            clearTestForm();
+        }
+
+        function hideTestForm() {
+            document.getElementById('testFormCard').style.display = 'none';
+            clearTestForm();
+        }
+
+        function clearTestForm() {
+            document.getElementById('testName').value = '';
+            document.getElementById('testDescription').value = '';
+            document.getElementById('testDuration').value = '10';
+            document.getElementById('testStartDate').value = '';
+            document.getElementById('testEndDate').value = '';
+            document.getElementById('testShuffle').checked = true;
+            document.getElementById('testShowResults').checked = true;
+            document.getElementById('testActive').checked = true;
+            document.getElementById('testMaxAttempts').value = '0';
+            currentTestId = null;
+        }
+
+        async function saveTest() {
+            const name = document.getElementById('testName').value.trim();
+            if (!name) {
+                alert('Please enter a test name');
+                return;
+            }
+
+            const testData = {
+                name: name,
+                description: document.getElementById('testDescription').value.trim(),
+                duration: parseInt(document.getElementById('testDuration').value) || 10,
+                start_date: document.getElementById('testStartDate').value || null,
+                end_date: document.getElementById('testEndDate').value || null,
+                shuffle_questions: document.getElementById('testShuffle').checked,
+                show_results: document.getElementById('testShowResults').checked,
+                is_active: document.getElementById('testActive').checked,
+                max_attempts: parseInt(document.getElementById('testMaxAttempts').value) || 0
+            };
+
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const url = currentTestId ? getApiUrl(`/api/tests/${currentTestId}`) : getApiUrl('/api/tests');
+                const method = currentTestId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                if (response.ok) {
+                    hideTestForm();
+                    loadTests();
+                    alert(currentTestId ? 'Test updated!' : 'Test created!');
+                } else {
+                    alert('Failed to save test');
+                }
+            } catch (e) {
+                alert('Error connecting to server');
+            }
+        }
+
+        async function editTest(id) {
+            const test = tests.find(t => t.id === id);
+            if (!test) return;
+
+            currentTestId = id;
+            document.getElementById('testFormCard').style.display = 'block';
+            document.getElementById('testFormTitle').textContent = '✏️ Edit Test';
+
+            document.getElementById('testName').value = test.name;
+            document.getElementById('testDescription').value = test.description || '';
+            document.getElementById('testDuration').value = test.duration;
+            document.getElementById('testStartDate').value = test.start_date ? test.start_date.slice(0, 16) : '';
+            document.getElementById('testEndDate').value = test.end_date ? test.end_date.slice(0, 16) : '';
+            document.getElementById('testShuffle').checked = test.shuffle_questions;
+            document.getElementById('testShowResults').checked = test.show_results;
+            document.getElementById('testActive').checked = test.is_active;
+            document.getElementById('testMaxAttempts').value = test.max_attempts || 0;
+        }
+
+        async function deleteTest(id) {
+            if (!confirm('Delete this test and all its questions?')) return;
+
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl(`/api/tests/${id}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
+                if (response.ok) {
+                    loadTests();
+                } else {
+                    alert('Failed to delete test');
+                }
+            } catch (e) {
+                alert('Error connecting to server');
+            }
+        }
+
+        // === QUESTION MANAGER FOR TEST ===
+        function manageQuestions(testId, testName) {
+            currentTestId = testId;
+            document.getElementById('selectedTestName').textContent = testName;
+            document.getElementById('editingTestId').value = testId;
+            document.getElementById('questionManagerCard').style.display = 'block';
+            document.getElementById('testsList').parentElement.style.display = 'none';
+            document.getElementById('testFormCard').style.display = 'none';
+            loadQuestions(testId);
+        }
+
+        function hideQuestionManager() {
+            document.getElementById('questionManagerCard').style.display = 'none';
+            document.getElementById('testsList').parentElement.style.display = 'block';
+            currentTestId = null;
+        }
+
+        async function loadQuestions(testId = null) {
+            try {
+                const url = testId ? getApiUrl(`/api/questions?test_id=${testId}`) : getApiUrl('/api/questions');
+                const response = await fetch(url);
+                questions = await response.json();
+                renderQuestions();
+            } catch (e) {
+                console.error('Failed to load questions');
+            }
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsList');
+            if (questions.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No questions yet. Add some using the form above.</p>';
+                return;
+            }
+
+            const diffColors = { easy: '#22c55e', medium: '#eab308', hard: '#ef4444' };
+
+            container.innerHTML = questions.map((q, i) => `
+                <div class="result-item" style="padding: 1rem; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 0.75rem; background: var(--card-bg);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">#${i + 1}</span>
+                                <span style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 12px; background: ${diffColors[q.difficulty || 'medium']}20; color: ${diffColors[q.difficulty || 'medium']}; font-weight: 600;">
+                                    ${(q.difficulty || 'medium').toUpperCase()}
+                                </span>
+                                ${q.code_snippet ? '<span title="Has code">💻</span>' : ''}
+                                ${q.image_url ? '<span title="Has image">🖼️</span>' : ''}
+                            </div>
+                            <div style="font-weight: 500; margin-bottom: 0.5rem;">${q.question}</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; font-size: 0.85rem; color: var(--text-muted);">
+                                <span class="${q.answer === 'A' ? 'correct-answer' : ''}">A: ${q.options.A}</span>
+                                <span class="${q.answer === 'B' ? 'correct-answer' : ''}">B: ${q.options.B}</span>
+                                <span class="${q.answer === 'C' ? 'correct-answer' : ''}">C: ${q.options.C}</span>
+                                <span class="${q.answer === 'D' ? 'correct-answer' : ''}">D: ${q.options.D}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
+                            <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" onclick="editQuestion('${q.id}')">✏️ Edit</button>
+                            <button class="btn btn-danger" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" onclick="deleteQuestion('${q.id}')">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // ... existing code ...
@@ -594,7 +644,10 @@
         // === SETTINGS ===
         async function loadSettings() {
             try {
-                const response = await fetch(getApiUrl('/api/settings'));
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl('/api/settings'), {
+                    headers: { 'Authorization': token }
+                });
                 if (response.ok) {
                     const settings = await response.json();
                     document.getElementById('quizDuration').value = settings.duration || 10;
@@ -612,9 +665,13 @@
             }
 
             try {
+                const token = sessionStorage.getItem('authToken');
                 const response = await fetch(getApiUrl('/api/settings'), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
                     body: JSON.stringify({ duration: parseInt(duration) })
                 });
 
@@ -637,15 +694,19 @@
                     renderQuestions();
                 }
             } catch (e) {
-                document.getElementById('questionsList').innerHTML = '<div class="empty-state">Server not running</div>';
+                document.getElementById('questionsList').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Server not running</div>';
             }
         }
 
         async function saveQuestionsToServer() {
             try {
+                const token = sessionStorage.getItem('authToken');
                 const response = await fetch(getApiUrl('/api/questions'), {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
                     body: JSON.stringify(questions)
                 });
                 return response.ok;
@@ -659,7 +720,7 @@
             const container = document.getElementById('questionsList');
 
             if (questions.length === 0) {
-                container.innerHTML = '<div class="empty-state">No questions yet</div>';
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">No questions yet</div>';
                 return;
             }
 
@@ -667,12 +728,12 @@
                 <div class="list-item">
                     <div class="item-header">
                         <div class="item-title">Q${i + 1}: ${q.question}</div>
-                        <div class="item-actions">
-                            <button class="btn btn-secondary" onclick="editQuestion(${i})">✏️</button>
-                            <button class="btn btn-danger" onclick="deleteQuestion(${i})">🗑️</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="editQuestion(${i})">✏️</button>
+                            <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteQuestion(${i})">🗑️</button>
                         </div>
                     </div>
-                    <div class="options-preview">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 1rem;">
                         <div class="option-preview ${q.answer === 'A' ? 'correct' : ''}">A. ${q.options.A}</div>
                         <div class="option-preview ${q.answer === 'B' ? 'correct' : ''}">B. ${q.options.B}</div>
                         <div class="option-preview ${q.answer === 'C' ? 'correct' : ''}">C. ${q.options.C}</div>
@@ -689,78 +750,314 @@
             const optionC = document.getElementById('optionC').value.trim();
             const optionD = document.getElementById('optionD').value.trim();
             const correctAnswer = document.getElementById('correctAnswer').value;
+            const editingQuestionId = document.getElementById('editingQuestionId').value;
+            const difficulty = document.getElementById('selectedDifficulty').value;
+            const codeSnippet = document.getElementById('codeSnippet').value.trim();
+            const codeLanguage = document.getElementById('codeLanguage').value;
+            const imageUrl = document.getElementById('imageUrl').value.trim();
 
-            if (!questionText || !optionA || !optionB || !optionC || !optionD) {
-                alert('Please fill all fields');
+            // Validation
+            let hasError = false;
+            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+
+            if (!questionText) {
+                document.getElementById('questionTextError').textContent = 'Question text is required';
+                hasError = true;
+            }
+            if (!optionA) {
+                document.getElementById('optionAError').textContent = 'Option A is required';
+                hasError = true;
+            }
+            if (!optionB || !optionC || !optionD) {
+                alert('Please fill all option fields');
+                hasError = true;
+            }
+            if (hasError) return;
+
+            if (!currentTestId) {
+                alert('No test selected. Please select a test first.');
                 return;
             }
 
-            const newQuestion = {
+            const questionData = {
                 question: questionText,
                 options: { A: optionA, B: optionB, C: optionC, D: optionD },
-                answer: correctAnswer
+                answer: correctAnswer,
+                test_id: currentTestId,
+                difficulty: difficulty,
+                code_snippet: codeSnippet || null,
+                code_language: codeSnippet ? codeLanguage : null,
+                image_url: imageUrl || null
             };
 
-            if (editingIndex >= 0) {
-                questions[editingIndex] = newQuestion;
-                editingIndex = -1;
-            } else {
-                questions.push(newQuestion);
-            }
+            try {
+                const token = sessionStorage.getItem('authToken');
+                let url, method;
 
-            if (await saveQuestionsToServer()) {
-                clearForm();
-                renderQuestions();
-            } else {
-                alert('Failed to save');
+                if (editingQuestionId) {
+                    url = getApiUrl(`/api/questions/${editingQuestionId}`);
+                    method = 'PUT';
+                } else {
+                    url = getApiUrl('/api/questions');
+                    method = 'POST';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(questionData)
+                });
+
+                if (response.ok) {
+                    clearQuestionForm();
+                    loadQuestions(currentTestId);
+                    showToast('Question saved successfully!', 'success');
+                } else {
+                    showToast('Failed to save question', 'error');
+                }
+            } catch (e) {
+                showToast('Error connecting to server', 'error');
             }
         }
 
-        function editQuestion(index) {
-            const q = questions[index];
-            editingIndex = index;
+        // === ENHANCED QUESTION FEATURES ===
+
+        function setDifficulty(level) {
+            document.getElementById('selectedDifficulty').value = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                const isActive = btn.dataset.difficulty === level;
+                btn.classList.toggle('active', isActive);
+                btn.style.background = isActive ? (level === 'easy' ? 'rgba(34, 197, 94, 0.1)' : level === 'medium' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(239, 68, 68, 0.1)') : 'transparent';
+            });
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const questionText = document.getElementById('questionText').value || 'Your question will appear here...';
+            const optionA = document.getElementById('optionA').value || 'Option A';
+            const optionB = document.getElementById('optionB').value || 'Option B';
+            const optionC = document.getElementById('optionC').value || 'Option C';
+            const optionD = document.getElementById('optionD').value || 'Option D';
+            const correctAnswer = document.getElementById('correctAnswer').value;
+            const difficulty = document.getElementById('selectedDifficulty').value;
+            const codeSnippet = document.getElementById('codeSnippet').value;
+            const imageUrl = document.getElementById('imageUrl').value;
+
+            // Update difficulty badge
+            const diffBadge = document.getElementById('previewDifficulty');
+            const colors = { easy: '#22c55e', medium: '#eab308', hard: '#ef4444' };
+            diffBadge.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+            diffBadge.style.background = `rgba(${difficulty === 'easy' ? '34, 197, 94' : difficulty === 'medium' ? '234, 179, 8' : '239, 68, 68'}, 0.2)`;
+            diffBadge.style.color = colors[difficulty];
+
+            let preview = `<div style="font-weight: 500; margin-bottom: 1rem;">${questionText}</div>`;
+
+            if (imageUrl) {
+                preview += `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px; margin-bottom: 1rem;" onerror="this.style.display='none'">`;
+            }
+
+            if (codeSnippet) {
+                preview += `<pre style="background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; overflow-x: auto; font-size: 0.85rem;"><code>${escapeHtml(codeSnippet)}</code></pre>`;
+            }
+
+            const options = { A: optionA, B: optionB, C: optionC, D: optionD };
+            preview += '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+            ['A', 'B', 'C', 'D'].forEach(key => {
+                const isCorrect = key === correctAnswer;
+                preview += `<div style="padding: 0.75rem; border-radius: 8px; border: 2px solid ${isCorrect ? '#22c55e' : 'var(--border)'}; background: ${isCorrect ? 'rgba(34, 197, 94, 0.1)' : 'transparent'};">
+                    <span style="font-weight: 600;">${key}.</span> ${options[key]}
+                    ${isCorrect ? '<span style="float: right; color: #22c55e;">✓</span>' : ''}
+                </div>`;
+            });
+            preview += '</div>';
+
+            document.getElementById('questionPreview').innerHTML = preview;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function applyTemplate() {
+            const template = document.getElementById('questionTemplate').value;
+            if (!template) return;
+
+            if (template === 'basic') {
+                document.getElementById('questionText').value = 'What is the correct answer?';
+                document.getElementById('optionA').value = 'Answer A';
+                document.getElementById('optionB').value = 'Answer B';
+                document.getElementById('optionC').value = 'Answer C';
+                document.getElementById('optionD').value = 'Answer D';
+            } else if (template === 'code') {
+                document.getElementById('questionText').value = 'What will be the output of the following code?';
+                document.getElementById('codeSnippet').value = '// Write your code here\nSystem.out.println("Hello");';
+                document.getElementById('optionA').value = 'Hello';
+                document.getElementById('optionB').value = 'Error';
+                document.getElementById('optionC').value = 'null';
+                document.getElementById('optionD').value = 'None of the above';
+                document.querySelector('details').open = true;
+            } else if (template === 'truefalse') {
+                document.getElementById('questionText').value = 'Is this statement true or false?';
+                document.getElementById('optionA').value = 'True';
+                document.getElementById('optionB').value = 'False';
+                document.getElementById('optionC').value = 'Cannot be determined';
+                document.getElementById('optionD').value = 'None of the above';
+            }
+
+            document.getElementById('questionTemplate').value = '';
+            updatePreview();
+        }
+
+        function showBulkImport() {
+            document.getElementById('bulkImportModal').style.display = 'flex';
+        }
+
+        function hideBulkImport() {
+            document.getElementById('bulkImportModal').style.display = 'none';
+            document.getElementById('bulkImportData').value = '';
+        }
+
+        async function processBulkImport() {
+            const data = document.getElementById('bulkImportData').value.trim();
+            if (!data) {
+                alert('Please paste CSV or JSON data');
+                return;
+            }
+
+            let questions = [];
+
+            try {
+                // Try JSON first
+                if (data.startsWith('[')) {
+                    questions = JSON.parse(data);
+                } else {
+                    // Parse CSV
+                    const lines = data.split('\n').filter(l => l.trim());
+                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+                        const q = {};
+                        headers.forEach((h, idx) => {
+                            if (h === 'optiona') q.options = { ...q.options, A: values[idx] };
+                            else if (h === 'optionb') q.options = { ...q.options, B: values[idx] };
+                            else if (h === 'optionc') q.options = { ...q.options, C: values[idx] };
+                            else if (h === 'optiond') q.options = { ...q.options, D: values[idx] };
+                            else q[h] = values[idx];
+                        });
+                        q.test_id = currentTestId;
+                        questions.push(q);
+                    }
+                }
+
+                // Import each question
+                const token = sessionStorage.getItem('authToken');
+                let successCount = 0;
+
+                for (const q of questions) {
+                    q.test_id = currentTestId;
+                    const response = await fetch(getApiUrl('/api/questions'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                        body: JSON.stringify(q)
+                    });
+                    if (response.ok) successCount++;
+                }
+
+                hideBulkImport();
+                loadQuestions(currentTestId);
+                showToast(`Imported ${successCount} of ${questions.length} questions!`, 'success');
+            } catch (e) {
+                alert('Failed to parse data: ' + e.message);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem;
+                background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                color: white; border-radius: 8px; z-index: 10000; animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function editQuestion(id) {
+            const q = questions.find(q => q.id === id);
+            if (!q) return;
+
+            document.getElementById('editingQuestionId').value = id;
             document.getElementById('questionText').value = q.question;
             document.getElementById('optionA').value = q.options.A;
             document.getElementById('optionB').value = q.options.B;
             document.getElementById('optionC').value = q.options.C;
             document.getElementById('optionD').value = q.options.D;
             document.getElementById('correctAnswer').value = q.answer;
-            document.getElementById('formTitle').textContent = '✏️ Edit Question';
-            document.getElementById('saveBtn').textContent = '💾 Update';
-            document.getElementById('cancelBtn').style.display = 'inline-block';
+
+            // Set difficulty
+            setDifficulty(q.difficulty || 'medium');
+
+            // Set code snippet
+            if (q.code_snippet) {
+                document.getElementById('codeSnippet').value = q.code_snippet;
+                document.getElementById('codeLanguage').value = q.code_language || 'java';
+                document.querySelector('details').open = true;
+            }
+
+            // Set image
+            if (q.image_url) {
+                document.getElementById('imageUrl').value = q.image_url;
+            }
+
+            document.getElementById('questionFormTitle').textContent = '✏️ Edit Question';
+            document.getElementById('cancelQuestionBtn').style.display = 'inline-block';
+            updatePreview();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        async function deleteQuestion(index) {
+        async function deleteQuestion(id) {
             if (!confirm('Delete this question?')) return;
 
-            // Backup just in case
-            const backup = [...questions];
-            questions.splice(index, 1);
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl(`/api/questions/${id}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
 
-            if (await saveQuestionsToServer()) {
-                renderQuestions();
-            } else {
-                questions = backup; // Restore on failure
-                alert('Failed to delete question on server');
-                // renderQuestions(); // effectively re-renders original
+                if (response.ok) {
+                    loadQuestions(currentTestId);
+                    showToast('Question deleted', 'success');
+                } else {
+                    showToast('Failed to delete question', 'error');
+                }
+            } catch (e) {
+                showToast('Error connecting to server', 'error');
             }
         }
 
-        function cancelEdit() {
-            editingIndex = -1;
-            clearForm();
+        function cancelEditQuestion() {
+            clearQuestionForm();
         }
 
-        function clearForm() {
-            ['questionText', 'optionA', 'optionB', 'optionC', 'optionD'].forEach(id => {
+        function clearQuestionForm() {
+            document.getElementById('editingQuestionId').value = '';
+            ['questionText', 'optionA', 'optionB', 'optionC', 'optionD', 'codeSnippet', 'imageUrl'].forEach(id => {
                 document.getElementById(id).value = '';
             });
             document.getElementById('correctAnswer').value = 'A';
-            document.getElementById('formTitle').textContent = '➕ Add New Question';
-            document.getElementById('saveBtn').textContent = '💾 Save Question';
-            document.getElementById('cancelBtn').style.display = 'none';
-            editingIndex = -1;
+            document.getElementById('questionFormTitle').textContent = '➕ Add Question';
+            document.getElementById('cancelQuestionBtn').style.display = 'none';
+            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+            setDifficulty('easy');
+            updatePreview();
         }
 
         async function generateWithAI() {
@@ -773,9 +1070,13 @@
             if (!confirm(`Generate ${count} questions about ${topic}? This may take a few seconds.`)) return;
 
             try {
+                const token = sessionStorage.getItem('authToken');
                 const response = await fetch(getApiUrl('/api/generate'), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
                     body: JSON.stringify({ topic, count: parseInt(count) })
                 });
 
@@ -812,7 +1113,7 @@
                 }
             } catch (e) {
                 console.error('Failed to load results:', e);
-                document.getElementById('resultsList').innerHTML = '<div class="empty-state">Failed to connect to server</div>';
+                document.getElementById('resultsList').innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">Failed to connect to server</div>';
             }
         }
 
@@ -827,7 +1128,7 @@
             const list = results.results || [];
 
             if (list.length === 0) {
-                container.innerHTML = '<div class="empty-state">No results yet</div>';
+                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">No results yet</div>';
                 return;
             }
 
@@ -840,17 +1141,21 @@
             });
 
             container.innerHTML = sortedList.map(r => {
-                const scoreClass = r.percentage >= 70 ? 'high' : (r.percentage >= 40 ? 'medium' : 'low');
+                let scoreColor = 'var(--text-main)';
+                if (r.percentage >= 70) scoreColor = 'var(--success)';
+                else if (r.percentage >= 40) scoreColor = 'var(--warning)';
+                else scoreColor = 'var(--danger)';
+
                 return `
                     <div class="result-item">
-                        <div class="result-header">
-                            <div>
-                                <span class="result-name">${r.name}</span>
-                                <span class="result-score ${scoreClass}">${r.score}/${r.total} (${r.percentage}%)</span>
-                            </div>
-                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" onclick="deleteResult('${r.id}')">✕</button>
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span style="font-weight: 600;">${r.name}</span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">${r.date} at ${r.time}</span>
                         </div>
-                        <div class="result-meta">${r.date} at ${r.time}</div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-weight: 700; color: ${scoreColor};">${r.score}/${r.total} (${r.percentage}%)</span>
+                            <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteResult('${r.id}')">✕</button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -859,7 +1164,11 @@
         async function deleteResult(id) {
             if (!confirm('Delete this result?')) return;
             try {
-                const response = await fetch(getApiUrl(`/api/results?id=${id}`), { method: 'DELETE' });
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl(`/api/results?id=${id}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
                 if (response.ok) {
                     loadResults(); // Reload list
                 } else {
@@ -873,7 +1182,11 @@
         async function clearAllResults() {
             if (!confirm('Clear ALL results? This cannot be undone.')) return;
             try {
-                const response = await fetch(getApiUrl('/api/results/clear'), { method: 'POST' });
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl('/api/results/clear'), {
+                    method: 'POST',
+                    headers: { 'Authorization': token }
+                });
                 if (response.ok) {
                     loadResults();
                     alert('All results cleared');
@@ -881,6 +1194,91 @@
             } catch (e) {
                 alert('Failed to clear');
             }
+        }
+
+
+        // === STUDENTS ===
+        async function loadStudents() {
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl('/api/students'), {
+                    headers: { 'Authorization': token }
+                });
+                if (response.ok) {
+                    const students = await response.json();
+                    renderStudents(students);
+                }
+            } catch (e) {
+                console.error('Failed to load students');
+            }
+        }
+
+        async function addStudent() {
+            const rollno = document.getElementById('newStudentRoll').value.trim();
+            const name = document.getElementById('newStudentName').value.trim();
+            const password = document.getElementById('newStudentPassword').value.trim();
+
+            if (!rollno || !name || !password) {
+                alert('All fields required');
+                return;
+            }
+
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl('/api/students'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify({ rollno, name, password })
+                });
+
+                if (response.ok) {
+                    alert('Student added!');
+                    document.getElementById('newStudentRoll').value = '';
+                    document.getElementById('newStudentName').value = '';
+                    document.getElementById('newStudentPassword').value = '';
+                    loadStudents();
+                } else {
+                    const data = await response.json();
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Network error');
+            }
+        }
+
+        async function deleteStudent(rollno) {
+            if (!confirm('Delete student ' + rollno + '?')) return;
+            try {
+                const token = sessionStorage.getItem('authToken');
+                const response = await fetch(getApiUrl(`/api/students?rollno=${rollno}`), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': token }
+                });
+                if (response.ok) loadStudents();
+                else alert('Failed to delete');
+            } catch (e) {
+                alert('Network error');
+            }
+        }
+
+        function renderStudents(list) {
+            const container = document.getElementById('studentsList');
+            if (list.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted); padding: 1rem;">No students found</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(s => `
+                <div class="result-item" style="justify-content: space-between;">
+                    <div>
+                        <strong>${s.name}</strong> <span style="color: var(--text-muted);">(${s.roll_number})</span>
+                    </div>
+                    <button class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="deleteStudent('${s.roll_number}')">Remove</button>
+                </div>
+            `).join('');
         }
 
         // Init

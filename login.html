@@ -5,147 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Java Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="color.css">
-    <style>
-        .login-container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            animation: slideUp 0.6s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            color: white;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #00d9ff;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 50px;
-            background: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
-            color: #1a1a2e;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 217, 255, 0.4);
-        }
-
-        .error-msg {
-            background: rgba(255, 107, 107, 0.2);
-            border: 1px solid rgba(255, 107, 107, 0.4);
-            border-radius: 10px;
-            padding: 12px;
-            color: #ff6b6b;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 25px;
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .back-link:hover {
-            color: #00d9ff;
-        }
-
-        .lock-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="lock-icon">🔐</div>
-        <h1>Admin Login</h1>
-        <p class="subtitle">Enter credentials to manage questions</p>
+    <div class="app-container" style="max-width: 400px;">
+        <div class="card">
+            <h1>Admin Login</h1>
+            <p class="subtitle">Enter credentials to manage questions</p>
 
-        <div class="error-msg" id="errorMsg">Invalid username or password</div>
-
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="username" placeholder="Enter username" required>
+            <div id="errorMsg"
+                style="display: none; background-color: #FEF2F2; color: var(--danger); padding: 0.75rem; border-radius: var(--radius); margin-bottom: 1.5rem; border: 1px solid var(--danger);">
+                Invalid username or password
             </div>
 
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Enter password" required>
-            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Username" required>
+                </div>
 
-            <button type="submit" class="login-btn">Login →</button>
-        </form>
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
 
-        <a href="index.html" class="back-link">← Back to Quiz</a>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+
+            <a href="index.html"
+                style="display: block; margin-top: 1.5rem; color: var(--text-muted); text-decoration: none; font-size: 0.875rem;">←
+                Back to Quiz</a>
+        </div>
     </div>
 
     <script src="config.js"></script>
@@ -174,6 +66,7 @@
                 if (data.success) {
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('adminUser', username);
+                    sessionStorage.setItem('authToken', data.token); // Store token
                     window.location.href = 'admin.html';
                 } else {
                     errorMsg.style.display = 'block';

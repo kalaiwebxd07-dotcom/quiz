@@ -1,5 +1,5 @@
 // ========================================
-// Java MCQ Quiz - Enhanced Script
+// Java MCQ Quiz - Script
 // ========================================
 
 // State
@@ -8,68 +8,39 @@ let currentQuestion = 0;
 let score = 0;
 let responses = [];
 let playerName = '';
-let quizEndTime = null; // Target end time for global timer
-
-// Timer Settings
-const TIME_PER_QUESTION = 30;
+let quizEndTime = null;
+let currentSelection = null;
 let timerInterval;
 let timeLeft;
 
-// API URLs - uses config.js for base URL
+// Constants
 const API_URL = getApiUrl('/api/results');
 const QUESTIONS_URL = getApiUrl('/api/questions');
 const STATE_KEY = 'quizState';
+let supabaseClient = null;
 
-// Save state to localStorage
-function saveState() {
-    const state = {
-        quiz: quiz,
-        currentQuestion: currentQuestion,
-        score: score,
-        responses: responses,
-        playerName: playerName,
-        quizEndTime: quizEndTime, // Save end time
-        currentSelection: currentSelection,
-        inProgress: true
-    };
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
-}
-
-// Load state from localStorage
-function loadState() {
-    try {
-        const saved = localStorage.getItem(STATE_KEY);
-        if (saved) {
-            return JSON.parse(saved);
-        }
-    } catch (e) {
-        console.log('Could not load saved state');
-    }
-    return null;
-}
-
-// Clear saved state
-function clearState() {
-    localStorage.removeItem(STATE_KEY);
+// Initialize Supabase if available
+if (typeof createClient !== 'undefined' && typeof SUPABASE_URL !== 'undefined') {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
 // DOM Elements
 const screens = {
     start: document.getElementById('startScreen'),
+    dashboard: document.getElementById('dashboardScreen'),
     quiz: document.getElementById('quizScreen'),
     result: document.getElementById('resultScreen'),
     review: document.getElementById('reviewScreen')
 };
 
 const elements = {
-    playerNameInput: document.getElementById('playerName'),
-    startBtn: document.getElementById('startBtn'),
+    loginBtn: document.getElementById('loginBtn'),
+    header: document.querySelector('.nav-header'),
+    optionsContainer: document.getElementById('options'),
     totalQuestions: document.getElementById('totalQuestions'),
     totalAttempts: document.getElementById('totalAttempts'),
     highScore: document.getElementById('highScore'),
     progressBar: document.getElementById('progressBar'),
-    progressText: document.getElementById('progressText'),
-    currentScore: document.getElementById('currentScore'),
     questionText: document.getElementById('questionText'),
     optionsContainer: document.getElementById('optionsContainer'),
     prevBtn: document.getElementById('prevBtn'),
@@ -82,18 +53,58 @@ const elements = {
     resultMessage: document.getElementById('resultMessage'),
     reviewBtn: document.getElementById('reviewBtn'),
     timer: document.getElementById('timer'),
-
     reviewList: document.getElementById('reviewList'),
-    backToResultBtn: document.getElementById('backToResultBtn')
+    backToResultBtn: document.getElementById('backToResultBtn'),
+    currentQuestionNum: document.getElementById('currentQuestionNum'),
+    totalQuestionCount: document.getElementById('totalQuestionCount')
 };
 
-// Screen Management
-function showScreen(screenName) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
-    screens[screenName].classList.add('active');
+// --- State Management ---
+
+function saveState() {
+    const state = {
+        quiz,
+        currentQuestion,
+        score,
+        responses,
+        playerName,
+        quizEndTime,
+        currentSelection,
+        inProgress: true
+    };
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
 }
 
-// Shuffle Array
+function loadState() {
+    try {
+        const saved = localStorage.getItem(STATE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+        console.error('Could not load saved state', e);
+        return null;
+    }
+}
+
+function clearState() {
+    localStorage.removeItem(STATE_KEY);
+}
+
+// --- Screen Management ---
+
+function showScreen(screenName) {
+    Object.values(screens).forEach(s => s.style.display = 'none');
+    if (screens[screenName]) screens[screenName].style.display = 'block';
+
+    // Header Logic
+    if (screenName === 'quiz' || screenName === 'review') {
+        elements.header.style.display = 'flex';
+    } else {
+        elements.header.style.display = 'none';
+    }
+}
+
+// --- Utils ---
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -102,11 +113,120 @@ function shuffle(array) {
     return array;
 }
 
-// Timer Functions - Global
+// --- Auth Functions ---
+
+
+// Duplicates removed
+
+async function handleStudentLogin() {
+    const rollno = document.getElementById('rollno').value.trim();
+    const password = document.getElementById('studentPassword').value.trim();
+    const errorEl = document.getElementById('loginError');
+
+    if (!rollno || !password) {
+        errorEl.textContent = 'Please enter Roll No and Password';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch(getApiUrl('/api/student/login'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rollno, password })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            sessionStorage.setItem('studentProfile', JSON.stringify(data.student));
+            handleAuthChange(data.student);
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    } catch (e) {
+        errorEl.textContent = 'Login failed';
+        errorEl.style.display = 'block';
+    }
+}
+
+async function loadDashboard(student) {
+    if (!student) return;
+
+    // Update Profile
+    document.getElementById('dashName').textContent = student.name;
+    document.getElementById('dashRoll').textContent = `Roll: ${student.rollno}`;
+    document.getElementById('dashAvatar').src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name);
+
+    // Fetch Stats
+    try {
+        const response = await fetch(getApiUrl(`/api/student/results?rollno=${student.rollno}`));
+        const results = await response.json();
+
+        // Stats
+        const attempts = results.length;
+        // const totalScore = results.reduce((acc, r) => acc + r.score, 0); 
+        const avgPct = attempts ? results.reduce((acc, r) => acc + parseFloat(r.percentage), 0) / attempts : 0;
+        const bestPct = attempts ? Math.max(...results.map(r => parseFloat(r.percentage))) : 0;
+
+        document.getElementById('dashTotal').textContent = attempts;
+        document.getElementById('dashAvg').textContent = Math.round(avgPct) + '%';
+        document.getElementById('dashBest').textContent = Math.round(bestPct) + '%';
+
+        // History Table
+        const list = document.getElementById('historyList');
+        if (attempts === 0) {
+            list.innerHTML = '<div style="color: var(--text-muted);">No attempts yet.</div>';
+        } else {
+            list.innerHTML = results.slice(0, 10).map(r => `
+                <div class="result-item" style="padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; display: flex; justify-content: space-between;">
+                     <div>
+                         <div style="font-weight: 500; margin-bottom: 0.25rem;">${r.date}</div>
+                         <div style="font-size: 0.8rem; color: var(--text-muted);">Time: ${r.time}</div>
+                     </div>
+                     <div style="font-weight: bold; color: var(--primary); font-size: 1.1rem;">
+                         ${r.percentage}%
+                     </div>
+                </div>
+            `).join('');
+        }
+    } catch (e) {
+        console.error('Failed to load dashboard', e);
+    }
+}
+
+async function handleLogout() {
+    sessionStorage.removeItem('studentProfile');
+    window.location.reload();
+}
+
+function handleAuthChange(student) {
+    const loginSection = document.getElementById('loginSection');
+
+    if (student) {
+        // Logged In -> Show Dashboard
+        playerName = student.name;
+
+        // Hide login, show dashboard
+        screens.start.style.display = 'none';
+        loginSection.style.display = 'none';
+
+        loadDashboard(student);
+        showScreen('dashboard');
+    } else {
+        // Logged Out -> Show Login
+        playerName = '';
+        showScreen('start');
+        loginSection.style.display = 'block';
+    }
+}
+
+// --- Timer Logic ---
+
 async function startGlobalTimer() {
     clearInterval(timerInterval);
 
-    // If no end time set (new quiz), fetch duration and set it
+    // If no end time set (new quiz), fetch duration
     if (!quizEndTime) {
         let durationMinutes = 10;
         try {
@@ -119,23 +239,18 @@ async function startGlobalTimer() {
             console.log('Using default duration');
         }
 
-        // Set target end time
         quizEndTime = Date.now() + (durationMinutes * 60 * 1000);
-        saveState(); // Save immediately so reload works
+        saveState();
     }
 
-    if (elements.timer) elements.timer.style.display = 'flex';
-
-    // Initial display update
+    if (elements.timer) elements.timer.style.display = 'inline-flex';
     updateTimerLogic();
-
     timerInterval = setInterval(updateTimerLogic, 1000);
 }
 
 function updateTimerLogic() {
     const now = Date.now();
     const diff = Math.ceil((quizEndTime - now) / 1000);
-
     timeLeft = diff > 0 ? diff : 0;
 
     updateTimerDisplay();
@@ -152,21 +267,25 @@ function updateTimerDisplay() {
     const s = timeLeft % 60;
     elements.timer.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-    // Visual styling
-    elements.timer.classList.remove('warning', 'danger');
-    if (timeLeft <= 60) elements.timer.classList.add('warning'); // Last minute
-    if (timeLeft <= 30) elements.timer.classList.add('danger');  // Last 30s
+    // Visual cues
+    if (timeLeft <= 30) {
+        elements.timer.style.color = 'var(--danger)';
+    } else if (timeLeft <= 60) {
+        elements.timer.style.color = 'var(--warning)';
+    } else {
+        elements.timer.style.color = 'var(--primary)';
+    }
 }
 
 function handleTimeout() {
     clearInterval(timerInterval);
     alert("Time's up! Submitting quiz...");
-    // Finish quiz immediately
     clearState();
     showResults();
 }
 
-// Load Questions from Server
+// --- Quiz Logic ---
+
 async function loadQuestions() {
     try {
         const response = await fetch(QUESTIONS_URL);
@@ -179,12 +298,11 @@ async function loadQuestions() {
         quiz = getDefaultQuestions();
     }
 
-    if (quiz.length === 0) {
+    if (!quiz || quiz.length === 0) {
         quiz = getDefaultQuestions();
     }
 }
 
-// Default Questions
 function getDefaultQuestions() {
     return [
         { question: "Which keyword is used to create a class in Java?", options: { A: "class", B: "new", C: "object", D: "create" }, answer: "A" },
@@ -195,132 +313,83 @@ function getDefaultQuestions() {
     ];
 }
 
-// Load Stats from Server
 async function loadStats() {
     try {
         const response = await fetch(API_URL);
         if (response.ok) {
             const data = await response.json();
-            elements.totalAttempts.textContent = data.statistics.totalAttempts;
-            elements.highScore.textContent = data.statistics.highestScore;
+            elements.totalAttempts.textContent = data.statistics.totalAttempts || 0;
+            elements.highScore.textContent = data.statistics.highestScore || 0;
         }
     } catch (e) {
         console.log('Could not load stats');
     }
 }
 
-// Save Result to Server
-async function saveResult(result) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(result)
-        });
-        return response.ok;
-    } catch (e) {
-        return false;
-    }
-}
-
-// Update Progress
 function updateProgress() {
     const progress = ((currentQuestion + 1) / quiz.length) * 100;
     elements.progressBar.style.width = progress + '%';
-    elements.progressText.textContent = `${currentQuestion + 1}/${quiz.length}`;
+
+    if (elements.currentQuestionNum) elements.currentQuestionNum.textContent = currentQuestion + 1;
+    if (elements.totalQuestionCount) elements.totalQuestionCount.textContent = quiz.length;
 }
 
-// Update Score Display (only if element exists)
-function updateScoreDisplay() {
-    if (elements.currentScore) {
-        elements.currentScore.textContent = score;
-    }
-}
-
-// Load Question
 function loadQuestion() {
     const q = quiz[currentQuestion];
     elements.questionText.textContent = q.question;
     elements.questionText.style.opacity = '1';
 
-    // Check if already answered
-    if (responses[currentQuestion]) {
-        // Question completed - lock options (timer runs globally)
-        // No timer manipulation here
+    // Reset options
+    const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
 
-        // Restore selection and lock options
-        currentSelection = responses[currentQuestion].selected;
+    // Check if already answered in this session
+    const answered = responses[currentQuestion];
 
-        const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
-        optionBtns.forEach(btn => {
-            const option = btn.dataset.option;
-            btn.querySelector('.option-text').textContent = q.options[option];
+    optionBtns.forEach(btn => {
+        const option = btn.dataset.option;
+        btn.querySelector('.option-text').textContent = q.options[option];
 
-            // Reset classes
-            btn.classList.remove('selected', 'correct', 'wrong');
+        // Remove old classes
+        btn.classList.remove('selected', 'correct', 'wrong');
 
-            // Highlight selected
-            if (option === currentSelection) {
-                btn.classList.add('selected');
-            }
-
-            // Disable button
+        if (answered) {
+            // Restore state
+            if (option === answered.selected) btn.classList.add('selected');
             btn.disabled = true;
-        });
+        } else {
+            // New state
+            btn.disabled = false;
+        }
+    });
 
-        // Show next button
+    if (answered) {
+        currentSelection = answered.selected;
         elements.nextBtn.style.display = 'inline-flex';
     } else {
-        // New question
-        // Global timer continues running...
-
-        // Update options normally
-        const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
-        optionBtns.forEach(btn => {
-            const option = btn.dataset.option;
-            btn.querySelector('.option-text').textContent = q.options[option];
-            btn.classList.remove('selected', 'correct', 'wrong');
-            btn.disabled = false;
-        });
-
         currentSelection = null;
         elements.nextBtn.style.display = 'none';
-
-        // Ensure timer is visible
-        if (elements.timer) elements.timer.style.display = 'flex';
     }
 
     updateProgress();
-    elements.prevBtn.style.display = currentQuestion > 0 ? 'inline-flex' : 'none';
+    elements.prevBtn.style.visibility = currentQuestion > 0 ? 'visible' : 'hidden';
 }
-
-// Handle Option Click - allows changing answer
-let currentSelection = null;
 
 function handleOptionClick(e) {
     const btn = e.currentTarget;
     const selectedOption = btn.dataset.option;
-    const q = quiz[currentQuestion];
 
-    // If clicking same option, do nothing
     if (currentSelection === selectedOption) return;
 
-    // Update selection
     currentSelection = selectedOption;
 
-    // Highlight selected
+    // UI Update
     const optionBtns = elements.optionsContainer.querySelectorAll('.option-btn');
-    optionBtns.forEach(b => {
-        b.classList.remove('selected');
-    });
+    optionBtns.forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
 
-    // Show next button
     elements.nextBtn.style.display = 'inline-flex';
 }
 
-// Handle Next Click
-// Handle Previous Click
 function handlePrevClick() {
     if (currentQuestion > 0) {
         currentQuestion--;
@@ -328,17 +397,10 @@ function handlePrevClick() {
     }
 }
 
-// Calculate Score from Responses
-function calculateScore() {
-    score = responses.reduce((acc, curr) => acc + (curr && curr.isCorrect ? 1 : 0), 0);
-    updateScoreDisplay();
-}
-
-// Handle Next Click
-// Handle Next Click
 function handleNextClick() {
-    // Store the response at current index
     const q = quiz[currentQuestion];
+
+    // Save response
     responses[currentQuestion] = {
         question: q.question,
         options: q.options,
@@ -347,113 +409,109 @@ function handleNextClick() {
         isCorrect: currentSelection === q.answer
     };
 
-    // Only increment score if this is a new answer or changed result
-    calculateScore();
+    // Calculate score
+    score = responses.reduce((acc, curr) => acc + (curr && curr.isCorrect ? 1 : 0), 0);
 
     currentQuestion++;
-
-    // Save progress
     saveState();
 
     if (currentQuestion < quiz.length) {
-        // Animate question transition
         elements.questionText.style.opacity = '0';
         setTimeout(() => {
             loadQuestion();
             elements.questionText.style.opacity = '1';
         }, 200);
     } else {
-        // Quiz complete
-        clearInterval(timerInterval); // Stop global timer
+        clearInterval(timerInterval);
         clearState();
         showResults();
     }
 }
 
-// Show Results
 async function showResults() {
     const percentage = Math.round((score / quiz.length) * 100);
 
-    // Update result display
     elements.finalScore.textContent = score;
     elements.scoreTotal.textContent = '/' + quiz.length;
     elements.scorePercent.textContent = percentage + '%';
 
-    // Set icon and message based on score
+    // Result Message
     if (percentage >= 80) {
-        elements.resultIcon.textContent = '🏆';
         elements.resultTitle.textContent = 'Excellent!';
         elements.resultMessage.textContent = "Outstanding performance! You're a Java expert!";
-        elements.scorePercent.style.color = '#10b981';
+        elements.scorePercent.style.color = 'var(--success)';
     } else if (percentage >= 60) {
-        elements.resultIcon.textContent = '🎉';
         elements.resultTitle.textContent = 'Good Job!';
-        elements.resultMessage.textContent = 'Great effort! Keep practicing to master Java.';
-        elements.scorePercent.style.color = '#06b6d4';
+        elements.resultMessage.textContent = 'Great effort! Keep practicing.';
+        elements.scorePercent.style.color = 'var(--primary)';
     } else if (percentage >= 40) {
-        elements.resultIcon.textContent = '💪';
         elements.resultTitle.textContent = 'Keep Trying!';
-        elements.resultMessage.textContent = "You're making progress. Review and try again!";
-        elements.scorePercent.style.color = '#f59e0b';
+        elements.resultMessage.textContent = "You're making progress.";
+        elements.scorePercent.style.color = 'var(--warning)';
     } else {
-        elements.resultIcon.textContent = '📚';
         elements.resultTitle.textContent = 'Study More!';
-        elements.resultMessage.textContent = 'Review Java basics and try again. You got this!';
-        elements.scorePercent.style.color = '#ef4444';
+        elements.resultMessage.textContent = 'Review Java basics and try again.';
+        elements.scorePercent.style.color = 'var(--danger)';
     }
 
-    // Save result
     const result = {
-        id: Date.now(),
         name: playerName || 'Anonymous',
         score: score,
         total: quiz.length,
         percentage: percentage,
         date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-        timestamp: new Date().toISOString(),
-        responses: responses.map(r => ({
-            question: r.question,
-            yourAnswer: r.selected || 'Not answered',
-            correctAnswer: r.correctAnswer,
-            result: r.isCorrect ? 'Correct' : 'Wrong'
-        }))
+        time: new Date().toLocaleTimeString()
     };
 
-    await saveResult(result);
-
+    await saveResultToServer(result);
     showScreen('result');
 }
 
-// Show Review
+async function saveResultToServer(result) {
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(result)
+        });
+    } catch (e) {
+        console.error('Failed to save result', e);
+    }
+}
+
 function showReview() {
     elements.reviewList.innerHTML = '';
 
     responses.forEach((r, i) => {
-        if (!r) return; // Skip if empty (shouldn't happen)
+        if (!r) return;
         const item = document.createElement('div');
-        item.className = 'review-item' + (r.isCorrect ? '' : ' wrong');
+        item.style.background = 'var(--background)';
+        item.style.padding = '1rem';
+        item.style.borderRadius = 'var(--radius)';
+        item.style.marginBottom = '1rem';
+        item.style.borderLeft = r.isCorrect ? '4px solid var(--success)' : '4px solid var(--danger)';
 
         let optionsHtml = '';
         for (let key in r.options) {
-            let optionClass = 'review-option';
+            let style = 'padding: 0.5rem; margin-top: 0.25rem; border-radius: 0.25rem; font-size: 0.9rem;';
             let marker = '';
 
             if (key === r.correctAnswer) {
-                optionClass += ' correct-answer';
+                style += ' background: #ECFDF5; color: #047857; font-weight: 500;';
                 marker = ' ✓';
-            }
-            if (key === r.selected && !r.isCorrect) {
-                optionClass += ' user-wrong';
+            } else if (key === r.selected && !r.isCorrect) {
+                style += ' background: #FEF2F2; color: #B91C1C;';
                 marker = ' ✗';
+            } else {
+                style += ' background: white; border: 1px solid var(--border);';
             }
 
-            optionsHtml += `<div class="${optionClass}">${key}. ${r.options[key]}${marker}</div>`;
+            optionsHtml += `<div style="${style}">${key}. ${r.options[key]}${marker}</div>`;
         }
 
         item.innerHTML = `
-            <div class="review-question">Q${i + 1}: ${r.question}</div>
-            <div class="review-options">${optionsHtml}</div>
+            <div style="font-weight: 600; margin-bottom: 0.5rem;">Q${i + 1}: ${r.question}</div>
+            <div>${optionsHtml}</div>
         `;
 
         elements.reviewList.appendChild(item);
@@ -462,66 +520,89 @@ function showReview() {
     showScreen('review');
 }
 
-// Start Quiz
 function startQuiz() {
-    playerName = elements.playerNameInput.value.trim() || 'Anonymous';
+    // If authenticated, use that name. If not (fallback), uses 'Anonymous'
+    if (!playerName && supabaseClient) {
+        // Should not happen if button hidden/shown correctly
+        alert('Please login first');
+        return;
+    }
+
     currentQuestion = 0;
     score = 0;
     responses = [];
     currentSelection = null;
-    quizEndTime = null; // Reset timer for new quiz
+    quizEndTime = null;
 
     shuffle(quiz);
-    updateScoreDisplay();
     loadQuestion();
-    startGlobalTimer(); // Start global timer
-    saveState(); // Save initial state
+    startGlobalTimer();
+    saveState();
     showScreen('quiz');
 }
 
+// --- Event Listeners ---
 
-
-// Event Listeners
-elements.startBtn.addEventListener('click', startQuiz);
+// elements.startBtn.addEventListener('click', startQuiz); // Removed
 elements.nextBtn.addEventListener('click', handleNextClick);
 elements.prevBtn.addEventListener('click', handlePrevClick);
 elements.reviewBtn.addEventListener('click', showReview);
-
 elements.backToResultBtn.addEventListener('click', () => showScreen('result'));
 
-// Option buttons
 elements.optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
     btn.addEventListener('click', handleOptionClick);
 });
 
-// Enter key to start
-elements.playerNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') startQuiz();
-});
 
-// Initialize
+// Removed obsolete playerNameInput listener
+
+
+// --- Initialization ---
+
 async function init() {
     await loadQuestions();
     await loadStats();
 
-    // Check for saved progress
+    // Setup Auth
+    elements.loginBtn.onclick = handleStudentLogin;
+
+    // Check session from storage
+    const student = JSON.parse(sessionStorage.getItem('studentProfile') || 'null');
+    if (student) {
+        handleAuthChange(student);
+    } else {
+        handleAuthChange(null);
+    }
+
+    /*
+    // Setup Auth Listeners (GitHub Auth - Deprecated for RollNo)
+    if (supabaseClient) {
+        // elements.loginBtn.onclick = signInWithGithub;
+        
+        // Check session
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        handleAuthChange(session);
+
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+            handleAuthChange(session);
+        });
+    }
+    */
+
     const savedState = loadState();
     if (savedState && savedState.inProgress && savedState.quiz && savedState.quiz.length > 0) {
-        // Restore saved state
+        // Restore
         quiz = savedState.quiz;
         currentQuestion = savedState.currentQuestion;
         score = savedState.score;
         responses = savedState.responses || [];
         playerName = savedState.playerName || 'Anonymous';
         currentSelection = savedState.currentSelection || null;
-        quizEndTime = savedState.quizEndTime || null; // Restore end time
+        quizEndTime = savedState.quizEndTime;
 
-        // Resume quiz
         loadQuestion();
         showScreen('quiz');
-        if (quizEndTime) {
-            startGlobalTimer(); // Resume timer
-        }
+        if (quizEndTime) startGlobalTimer();
         console.log('✅ Restored quiz progress');
     } else {
         showScreen('start');
