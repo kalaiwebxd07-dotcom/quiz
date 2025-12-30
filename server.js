@@ -253,6 +253,19 @@ app.delete('/api/results', requireAuth, async (req, res) => {
     res.json({ success: true });
 });
 
+app.get('/api/student/results', async (req, res) => {
+    if (!supabase) return res.json([]);
+    const { rollno } = req.query;
+    let query = supabase.from('results').select('*').order('created_at', { ascending: false });
+
+    if (rollno) {
+        query = query.eq('roll_number', rollno);
+    }
+
+    const { data, error } = await query;
+    res.json(error ? [] : data);
+});
+
 // --- Routes: Students ---
 app.get('/api/students', requireAuth, async (req, res) => {
     if (!supabase) return res.status(401).json([]);
@@ -331,7 +344,12 @@ app.post('/api/generate', requireAuth, async (req, res) => {
 
                 // Save generated questions to DB (as separate entries)
                 if (supabase && Array.isArray(questions)) {
-                    await supabase.from('questions').insert(questions);
+                    // Add test_id to each question
+                    const questionsWithTestId = questions.map(q => ({
+                        ...q,
+                        test_id: req.body.test_id || null
+                    }));
+                    await supabase.from('questions').insert(questionsWithTestId);
                 }
 
                 res.json({
