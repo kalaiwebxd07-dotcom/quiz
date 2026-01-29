@@ -3,6 +3,7 @@
    ======================================== */
 
 /* CSS Variables */
+/* CSS Variables */
 :root {
     --primary: #6366f1;
     --primary-light: #818cf8;
@@ -11,12 +12,27 @@
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
-    --dark: #0f172a;
-    --light: #f8fafc;
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* Light Mode Defaults */
+    --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    --bg-card: #ffffff;
+    --bg-input: #eff6ff;
+    /* Matches our recent login fix */
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --bg-body: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    --bg-card: #1e293b;
+    --bg-input: #334155;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
 }
 
 /* Reset & Base */
@@ -651,30 +667,79 @@ body {
     .final-score {
         font-size: 2.5rem;
     }
+
+    /* Quiz Header Optimization for Mobile */
+    .quiz-header {
+        margin-bottom: 20px !important;
+        gap: 10px !important;
+    }
+
+    /* Make timer more compact */
+    .timer {
+        min-width: auto !important;
+        padding: 6px 12px !important;
+        font-size: 1.1rem !important;
+    }
+
+    .timer::before {
+        font-size: 1rem !important;
+    }
+
+    /* Hide the large title text to save space, keep progress text */
+    .quiz-header h2 {
+        display: none;
+    }
+
+    #quizProgressText {
+        font-size: 0.85rem !important;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
+
+    /* Compact Exit Button */
+    .quiz-header button {
+        padding: 6px 12px !important;
+        font-size: 0.85rem !important;
+    }
 }
 
-/* Timer */
+/* Timer - Reset positioning for header layout */
 .timer {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 100px;
-    /* Increased width */
-    height: 44px;
-    /* Slightly reduced height */
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid var(--primary-light);
-    border-radius: 22px;
-    /* Pill shape */
+    position: relative;
+    /* Changed from absolute */
+    top: auto;
+    right: auto;
+    min-width: 130px;
+    padding: 8px 16px;
+    height: auto;
+    background: #ede9fe;
+    /* Lavender */
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: white;
-    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    gap: 10px;
+    font-size: 1.3rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #7c3aed;
+    /* Deep Purple */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     letter-spacing: 1px;
+    z-index: 10;
+}
+
+/* Stopwatch Icon */
+.timer::before {
+    content: "⏱️";
+    font-size: 1.2rem;
+    filter: sepia(100%) hue-rotate(230deg) saturate(900%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -2px;
 }
 
 .timer.warning {

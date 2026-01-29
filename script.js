@@ -48,27 +48,163 @@ function loadState() {
     return null;
 }
 
+// Avatar Upload Logic
+async function uploadAvatar(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (file.size > 500000) { // Limit to ~500KB
+        alert('File is too large. Please select an image under 500KB.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+        const base64Image = e.target.result;
+
+        // Update UI immediately
+        const avatarEl = document.getElementById('userAvatar');
+        if (avatarEl) {
+            avatarEl.innerHTML = `<img src="${base64Image}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            avatarEl.style.background = 'transparent'; // Remove gradient
+        }
+
+        // Send to backend
+        const rollNumber = sessionStorage.getItem('rollNumber');
+        if (rollNumber && rollNumber !== 'N/A') {
+            try {
+                await fetch(getApiUrl('/api/student/update'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rollNumber, avatar: base64Image })
+                });
+                // Update session storage if needed, or just rely on profile Load
+                // Ideally we reload profile data on init
+            } catch (err) {
+                console.error('Failed to upload avatar', err);
+            }
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
 // Clear saved state
 function clearState() {
     localStorage.removeItem(STATE_KEY);
 }
 
+// Dark Mode Logic
+function initDarkMode() {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        updateDarkModeIcon(true);
+    }
+}
+
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    const isDark = body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDark);
+    updateDarkModeIcon(isDark);
+}
+
+function updateDarkModeIcon(isDark) {
+    const btn = document.getElementById('darkModeToggle');
+    if (btn) {
+        btn.innerHTML = isDark ? '☀️' : '🌙';
+        btn.style.color = isDark ? '#fbbf24' : '#6b7280'; // Yellow sun, gray moon
+    }
+}
+
+// Helper to set element styles dynamically if needed
+function applyTheme() {
+    // If we rely purely on CSS vars, this might be empty, 
+    // but useful if we need to force update some inline styles.
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', initDarkMode);
+
 // DOM Elements
 const screens = {
     start: document.getElementById('startScreen'),
+    dashboard: document.getElementById('dashboardScreen'),
     quiz: document.getElementById('quizScreen'),
     result: document.getElementById('resultScreen'),
     review: document.getElementById('reviewScreen')
 };
 
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username')?.value;
+            const rollNumber = document.getElementById('rollNumber')?.value;
+            const password = document.getElementById('password')?.value;
+            const btn = document.getElementById('loginBtn');
+
+            // UI Feedback
+            const originalText = btn.innerText;
+            btn.innerText = 'Verifying...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(getApiUrl('/api/student/login'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, rollNumber, password })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    playerName = data.student.name;
+                    const rollNo = data.student.rollNumber || 'N/A';
+
+                    // Clean up existing state for a fresh start
+                    clearState();
+
+                    // Save session info
+                    sessionStorage.setItem('username', data.student.name || data.student.username);
+                    sessionStorage.setItem('rollNumber', data.student.rollNumber || 'N/A');
+
+                    // Also save object for other uses
+                    const session = {
+                        name: data.student.name,
+                        rollNo: data.student.rollNumber,
+                        loggedIn: true
+                    };
+                    localStorage.setItem('studentSession', JSON.stringify(session));
+
+                    // Redirect to student dashboard
+                    window.location.href = 'student.html';
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (e) {
+                console.error('Login error:', e);
+                alert('Login error. Check console.');
+            } finally {
+                if (btn) {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            }
+        });
+    }
+});
+
 const elements = {
-    playerNameInput: document.getElementById('playerName'),
-    startBtn: document.getElementById('startBtn'),
+    // startBtn removed
     totalQuestions: document.getElementById('totalQuestions'),
     totalAttempts: document.getElementById('totalAttempts'),
     highScore: document.getElementById('highScore'),
     progressBar: document.getElementById('progressBar'),
-    progressText: document.getElementById('progressText'),
+    quizProgressText: document.getElementById('quizProgressText'),
     currentScore: document.getElementById('currentScore'),
     questionText: document.getElementById('questionText'),
     optionsContainer: document.getElementById('optionsContainer'),
@@ -89,7 +225,10 @@ const elements = {
 
 // Screen Management
 function showScreen(screenName) {
-    Object.values(screens).forEach(s => s.classList.remove('active'));
+    if (!screens[screenName]) return; // Guard clause
+    Object.values(screens).forEach(s => {
+        if (s) s.classList.remove('active');
+    });
     screens[screenName].classList.add('active');
 }
 
@@ -172,7 +311,7 @@ async function loadQuestions() {
         const response = await fetch(QUESTIONS_URL);
         if (response.ok) {
             quiz = await response.json();
-            elements.totalQuestions.textContent = quiz.length;
+            if (elements.totalQuestions) elements.totalQuestions.textContent = quiz.length;
         }
     } catch (e) {
         console.log('Using default questions');
@@ -184,16 +323,7 @@ async function loadQuestions() {
     }
 }
 
-// Default Questions
-function getDefaultQuestions() {
-    return [
-        { question: "Which keyword is used to create a class in Java?", options: { A: "class", B: "new", C: "object", D: "create" }, answer: "A" },
-        { question: "What is the entry point method of a Java program?", options: { A: "start()", B: "run()", C: "main()", D: "init()" }, answer: "C" },
-        { question: "What is the size of int in Java (in bits)?", options: { A: "8", B: "16", C: "32", D: "64" }, answer: "C" },
-        { question: "Which is NOT a primitive data type in Java?", options: { A: "int", B: "float", C: "String", D: "boolean" }, answer: "C" },
-        { question: "Which keyword creates an object in Java?", options: { A: "class", B: "new", C: "this", D: "object" }, answer: "B" }
-    ];
-}
+// ... (skipping defaultQuestions)
 
 // Load Stats from Server
 async function loadStats() {
@@ -201,8 +331,8 @@ async function loadStats() {
         const response = await fetch(API_URL);
         if (response.ok) {
             const data = await response.json();
-            elements.totalAttempts.textContent = data.statistics.totalAttempts;
-            elements.highScore.textContent = data.statistics.highestScore;
+            if (elements.totalAttempts) elements.totalAttempts.textContent = data.statistics.totalAttempts;
+            if (elements.highScore) elements.highScore.textContent = data.statistics.highestScore;
         }
     } catch (e) {
         console.log('Could not load stats');
@@ -217,17 +347,72 @@ async function saveResult(result) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(result)
         });
-        return response.ok;
+
+        if (response.ok) {
+            console.log('Result saved successfully');
+            // Reload stats and history if on dashboard
+            loadStats();
+        } else {
+            console.error('Failed to save result');
+        }
     } catch (e) {
-        return false;
+        console.error('Error saving result:', e);
+    }
+}
+
+// Load Student History
+async function loadStudentHistory() {
+    const listContainer = document.querySelector('.card:nth-child(2) > div');
+    // ^ Targeting "Recent Quiz Activity" container. 
+    // In student.html, it's the second card in the left column.
+    // The specific div has "No quiz attempts yet." text initially.
+
+    if (!listContainer) return;
+
+    try {
+        const response = await fetch(API_URL);
+        if (response.ok) {
+            const data = await response.json();
+            const myResults = data.results.filter(r => r.name === playerName).reverse(); // Newest first
+
+            if (myResults.length > 0) {
+                listContainer.style.display = 'block';
+                listContainer.style.height = 'auto';
+                listContainer.innerHTML = myResults.map(r => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f3f4f6;">
+                        <div>
+                            <div style="font-weight: 600; color: #1f2937;">Java MCQ Quiz</div>
+                            <div style="font-size: 0.85rem; color: #6b7280;">${new Date(r.timestamp || Date.now()).toLocaleDateString()} • ${r.score}/${r.total}</div>
+                        </div>
+                        <div style="font-weight: 700; color: ${r.percentage >= 60 ? '#10b981' : '#f59e0b'};">
+                            ${r.percentage}%
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add a "View All" link if many results? Maybe later.
+            } else {
+                listContainer.innerHTML = 'No quiz attempts yet.';
+                listContainer.style.display = 'flex';
+                listContainer.style.alignItems = 'center';
+                listContainer.style.justifyContent = 'center';
+                listContainer.style.height = '100px';
+                listContainer.style.color = '#9ca3af';
+            }
+        }
+    } catch (e) {
+        console.error('Error loading history:', e);
     }
 }
 
 // Update Progress
 function updateProgress() {
     const progress = ((currentQuestion + 1) / quiz.length) * 100;
-    elements.progressBar.style.width = progress + '%';
-    elements.progressText.textContent = `${currentQuestion + 1}/${quiz.length}`;
+    if (elements.progressBar) elements.progressBar.style.width = progress + '%';
+
+    if (elements.quizProgressText) {
+        elements.quizProgressText.textContent = `Question ${currentQuestion + 1} of ${quiz.length}`;
+    }
 }
 
 // Update Score Display (only if element exists)
@@ -292,6 +477,17 @@ function loadQuestion() {
 
     updateProgress();
     elements.prevBtn.style.display = currentQuestion > 0 ? 'inline-flex' : 'none';
+
+    // Update Next Button text/style for last question
+    if (currentQuestion === quiz.length - 1) {
+        elements.nextBtn.innerHTML = 'Submit Quiz <span class="btn-icon">✓</span>';
+        elements.nextBtn.classList.remove('btn-secondary');
+        elements.nextBtn.classList.add('btn-primary');
+    } else {
+        elements.nextBtn.innerHTML = 'Next Question <span class="btn-icon">→</span>';
+        elements.nextBtn.classList.add('btn-secondary');
+        elements.nextBtn.classList.remove('btn-primary');
+    }
 }
 
 // Handle Option Click - allows changing answer
@@ -463,8 +659,18 @@ function showReview() {
 }
 
 // Start Quiz
-function startQuiz() {
-    playerName = elements.playerNameInput.value.trim() || 'Anonymous';
+async function startQuiz() {
+    // Check if quiz is loaded
+    if (!quiz || quiz.length === 0) {
+        // Try to load again
+        await loadQuestions();
+        if (!quiz || quiz.length === 0) {
+            alert("No questions available! Please contact your administrator.");
+            return;
+        }
+    }
+
+    // playerName is already set by login
     currentQuestion = 0;
     score = 0;
     responses = [];
@@ -473,59 +679,181 @@ function startQuiz() {
 
     shuffle(quiz);
     updateScoreDisplay();
-    loadQuestion();
-    startGlobalTimer(); // Start global timer
-    saveState(); // Save initial state
-    showScreen('quiz');
-}
 
-
-
-// Event Listeners
-elements.startBtn.addEventListener('click', startQuiz);
-elements.nextBtn.addEventListener('click', handleNextClick);
-elements.prevBtn.addEventListener('click', handlePrevClick);
-elements.reviewBtn.addEventListener('click', showReview);
-
-elements.backToResultBtn.addEventListener('click', () => showScreen('result'));
-
-// Option buttons
-elements.optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-    btn.addEventListener('click', handleOptionClick);
-});
-
-// Enter key to start
-elements.playerNameInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') startQuiz();
-});
-
-// Initialize
-async function init() {
-    await loadQuestions();
-    await loadStats();
-
-    // Check for saved progress
-    const savedState = loadState();
-    if (savedState && savedState.inProgress && savedState.quiz && savedState.quiz.length > 0) {
-        // Restore saved state
-        quiz = savedState.quiz;
-        currentQuestion = savedState.currentQuestion;
-        score = savedState.score;
-        responses = savedState.responses || [];
-        playerName = savedState.playerName || 'Anonymous';
-        currentSelection = savedState.currentSelection || null;
-        quizEndTime = savedState.quizEndTime || null; // Restore end time
-
-        // Resume quiz
+    try {
         loadQuestion();
+        startGlobalTimer(); // Start global timer
+        saveState(); // Save initial state
         showScreen('quiz');
-        if (quizEndTime) {
-            startGlobalTimer(); // Resume timer
-        }
-        console.log('✅ Restored quiz progress');
-    } else {
-        showScreen('start');
+    } catch (e) {
+        console.error("Error starting quiz:", e);
+        alert("Error starting quiz. Please try again.");
     }
 }
 
+function exitQuiz() {
+    if (confirm('Are you sure you want to exit? Progress will be lost.')) {
+        clearState();
+        if (typeof timerInterval !== 'undefined') clearInterval(timerInterval);
+        showScreen('dashboard');
+    }
+}
+
+// Event Listeners
+// Start button listener removed - replaced by loginBtn specific listener
+// Event Listeners
+// Start button listener removed - replaced by loginBtn specific listener
+if (elements.nextBtn) elements.nextBtn.addEventListener('click', handleNextClick);
+if (elements.prevBtn) elements.prevBtn.addEventListener('click', handlePrevClick);
+if (elements.reviewBtn) elements.reviewBtn.addEventListener('click', showReview);
+
+if (elements.backToResultBtn) elements.backToResultBtn.addEventListener('click', () => showScreen('result'));
+
+// Option buttons
+if (elements.optionsContainer) {
+    elements.optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', handleOptionClick);
+    });
+}
+
+// Enter key to start - Removed as playerNameInput doesn't exist
+// elements.playerNameInput?.addEventListener('keypress', (e) => {
+//     if (e.key === 'Enter') startQuiz();
+// });
+
+// Initialize
+// Initialize
+async function init() {
+    // Check which page we are on
+    const isStudentPage = window.location.pathname.includes('student.html');
+    const isIndexPage = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/');
+
+    if (isStudentPage) {
+        // We are on the student dashboard/app
+
+        // Check authentication
+        const sessionWithStr = localStorage.getItem('studentSession');
+        if (!sessionWithStr) {
+            // Not logged in, redirect to login
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const session = JSON.parse(sessionWithStr);
+        playerName = session.name;
+
+        // Initialize UI with session data
+        if (document.getElementById('navProfileName')) document.getElementById('navProfileName').textContent = session.name;
+
+        const initials = session.name.substring(0, 2).toUpperCase();
+        const profileDiv = document.querySelector('.profile-dropdown div');
+        if (profileDiv) profileDiv.textContent = initials;
+
+        if (document.getElementById('dropdownName')) document.getElementById('dropdownName').textContent = session.name;
+        if (document.getElementById('dropdownRoll')) document.getElementById('dropdownRoll').textContent = `Roll: ${session.rollNo}`;
+
+        // Load app data
+        await loadQuestions();
+        await loadStats();
+        await loadStudentHistory();
+
+        // Check for saved quiz progress only
+        const savedState = loadState();
+        if (savedState && savedState.inProgress && savedState.quiz && savedState.quiz.length > 0) {
+            // Restore saved state
+            quiz = savedState.quiz;
+            currentQuestion = savedState.currentQuestion;
+            score = savedState.score;
+            responses = savedState.responses || [];
+            // playerName is already set from session
+            currentSelection = savedState.currentSelection || null;
+            quizEndTime = savedState.quizEndTime || null; // Restore end time
+
+            // Resume quiz
+            loadQuestion();
+            showScreen('quiz');
+            if (quizEndTime) {
+                startGlobalTimer(); // Resume timer
+            }
+            console.log('✅ Restored quiz progress');
+        } else {
+            // Default to dashboard
+            showScreen('dashboard');
+        }
+
+    } else if (isIndexPage) {
+        // We are on the login page
+        // Check if already logged in -> redirect to student
+        const sessionWithStr = localStorage.getItem('studentSession');
+        if (sessionWithStr) {
+            try {
+                const session = JSON.parse(sessionWithStr);
+                if (session.loggedIn) {
+                    window.location.href = 'student.html';
+                    return;
+                }
+            } catch (e) {
+                localStorage.removeItem('studentSession');
+            }
+        }
+
+        // Ensure start screen is active
+        if (screens.start) screens.start.classList.add('active');
+    }
+}
+
+// Dashboard Functions
+function switchDashboardTab(tabName) {
+    // Update Nav Links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        link.style.borderBottom = 'none';
+        link.style.color = '#6b7280';
+        link.style.paddingBottom = '0';
+    });
+
+    // Find clicked link based on onclick attribute (simple approximation)
+    const clickedLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.getAttribute('onclick')?.includes(tabName));
+    if (clickedLink) {
+        clickedLink.classList.add('active');
+        clickedLink.style.borderBottom = '3px solid #6366f1';
+        clickedLink.style.color = '#6366f1';
+        clickedLink.style.paddingBottom = '24px';
+    }
+
+    // Toggle Content
+    const dashboardTab = document.getElementById('dashboardTab');
+    const myQuizzesTab = document.getElementById('myQuizzesTab');
+
+    if (tabName === 'dashboard') {
+        dashboardTab.style.display = 'block';
+        myQuizzesTab.style.display = 'none';
+    } else {
+        dashboardTab.style.display = 'none';
+        myQuizzesTab.style.display = 'block';
+    }
+}
+
+function toggleProfileDropdown() {
+    const menu = document.getElementById('profileDropdownMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function logout() {
+    playerName = "";
+    localStorage.removeItem('studentSession');
+    localStorage.removeItem(STATE_KEY); // Also clear quiz progress
+    window.location.href = 'index.html';
+}
+
+// Close dropdown when clicking outside
+window.addEventListener('click', (e) => {
+    const dropdown = document.querySelector('.profile-dropdown');
+    const menu = document.getElementById('profileDropdownMenu');
+    if (dropdown && !dropdown.contains(e.target) && menu && menu.style.display === 'block') {
+        menu.style.display = 'none';
+    }
+});
+
+// Initialize
 init();

@@ -1,75 +1,64 @@
-# Java MCQ Quiz
+# Java MCQ Quiz Portal
 
-A modern, production-ready Java MCQ Quiz application with an admin panel for managing questions and viewing results.
+A comprehensive web-based Quiz Management System featuring separate Admin and Student portals, real-time quiz taking, and dashboard analytics.
 
 ## Features
 
-- 🎮 Modern quiz interface with animations
-- 📊 Progress tracking and statistics
-- 📝 Answer review after completion
-- 🔄 Progress persistence (survives page refresh)
-- ⚙️ Admin panel with Question & Results managers
-- 🤖 AI-powered question generation (optional)
-- 🔐 Admin authentication
+### � Student Portal
+- **Secure Login**: Access using Username, Roll Number, and Password.
+- **Dashboard**: View upcoming quizzes, calendar, and recent activity (timeline).
+- **Interactive Quiz Interface**: Timed quizzes with progress tracking.
+- **Results**: Immediate score display with review capability.
+- **Profile Management**: View personal details (Roll Number, Name).
+- **Profile Customization**: Upload custom profile picture (Avatar).
+- **Dark Mode**: Toggle between Light and Dark themes for visual comfort.
 
-## Quick Start
+### �️ Admin Portal
+- **Dashboard**: Overview of system statistics (active quizzes, total students).
+- **Test Manager**: Create, edit, and schedule tests (start/end times).
+- **Question Manager**: Add, edit, and delete questions for specific tests.
+- **Student Manager**: View and manage registered students.
+- **Results Manager**: View student performance, filter by highest/lowest scores, and export data.
 
-### 1. Install dependencies
-```bash
-npm install
-```
+## Tech Stack
+- **Frontend**: HTML5, CSS3 (Custom Design System), JavaScript (Vanilla).
+- **Backend**: Node.js (Built-in `http` module), File System (`fs`) for data persistence.
+- **Data Storage**: JSON files (`students.json`, `questions.json`, `tests.json`, `results.json`).
 
-### 2. Configure environment
-```bash
-# Copy the example env file
-cp .env.example .env
+## Setup & Run
 
-# Edit .env with your values
-```
+1.  **Prerequisites**: Ensure [Node.js](https://nodejs.org/) is installed.
+2.  **Install Dependencies** (if any extra modules are added later):
+    ```bash
+    npm install
+    ```
+3.  **Start the Server**:
+    ```bash
+    node server.js
+    ```
+4.  **Access the Application**:
+    -   **Student Login**: `http://localhost:8080/index.html`
+    -   **Admin Login**: `http://localhost:8080/login.html`
 
-### 3. Run the server
-```bash
-npm start
-```
+## Default Credentials
 
-### 4. Open in browser
-```
-http://localhost:8080
-```
+### Admin Login
+- **Username**: `kalai`
+- **Password**: `kalai@100`
 
-## Environment Variables
+### Student Login (Example)
+- **Username**: `kalai`
+- **Roll Number**: `24CS100`
+- **Password**: `kalai@100`
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `PORT` | No | Server port (default: 8080) |
-| `ADMIN_USERNAME` | Yes | Admin login username |
-| `ADMIN_PASSWORD` | Yes | Admin login password |
-| `GITHUB_TOKEN` | No | GitHub token for AI features |
+*(See `students.json` for more student accounts)*
 
-## Admin Panel
-
-Access the admin panel at `/login.html`:
-- **Question Manager**: Add, edit, delete questions
-- **Results Manager**: View statistics and all quiz results
-
-## Project Structure
-
-```
-├── index.html      # Main quiz page
-├── login.html      # Admin login page
-├── admin.html      # Admin panel
-├── script.js       # Quiz logic
-├── color.css       # Styling
-├── server.js       # Node.js backend
-├── questions.json  # Quiz questions
-├── results.json    # Quiz results
-└── package.json    # Dependencies
-```
-
-## Production Deployment
-
-1. Set secure values in `.env`
-2. Use a process manager like PM2: `pm2 start server.js`
-3. Configure reverse proxy (nginx/apache)
-4. Enable HTTPS
-
+## File Structure
+- `server.js`: Main backend server logic and API endpoints.
+- `index.html`: Student login page.
+- `student.html`: Student dashboard.
+- `admin.html`: Admin dashboard.
+- `login.html`: Admin login page.
+- `script.js`: Core frontend logic (quiz engine, state management).
+- `config.js`: Configuration constants.
+- `color.css`: Global styles and variables.

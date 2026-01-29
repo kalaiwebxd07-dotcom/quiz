@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 8080;
 const RESULTS_FILE = path.join(__dirname, 'results.json');
 const QUESTIONS_FILE = path.join(__dirname, 'questions.json');
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
+const TESTS_FILE = path.join(__dirname, 'tests.json');
+const STUDENTS_FILE = path.join(__dirname, 'students.json');
 
 // GitHub Models API configuration (optional - for AI features)
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
@@ -27,7 +29,7 @@ const mimeTypes = {
 // Admin credentials from environment (REQUIRED)
 const ADMIN_CREDENTIALS = {
     username: process.env.ADMIN_USERNAME || 'kalai',
-    password: process.env.ADMIN_PASSWORD || 'kalai100'
+    password: process.env.ADMIN_PASSWORD || 'kalai@100'
 };
 
 // Default questions (fallback)
@@ -97,6 +99,36 @@ function saveResults(data) {
 // Save questions to file
 function saveQuestions(questions) {
     fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questions, null, 2));
+}
+
+// Read available tests
+function readTests() {
+    try {
+        const data = fs.readFileSync(TESTS_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (e) {
+        if (!fs.existsSync(TESTS_FILE)) fs.writeFileSync(TESTS_FILE, '[]');
+        return [];
+    }
+}
+
+function saveTests(tests) {
+    fs.writeFileSync(TESTS_FILE, JSON.stringify(tests, null, 2));
+}
+
+// Read students
+function readStudents() {
+    try {
+        const data = fs.readFileSync(STUDENTS_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (e) {
+        return [];
+    }
+}
+
+// Save students
+function saveStudents(students) {
+    fs.writeFileSync(STUDENTS_FILE, JSON.stringify(students, null, 2));
 }
 
 // Generate questions using GitHub Models API
@@ -232,7 +264,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    // API: Login
+    // API: Login (Admin)
     if (req.url === '/api/login' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => body += chunk);
@@ -243,7 +275,7 @@ const server = http.createServer(async (req, res) => {
                 if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
                     console.log(`✅ Admin login successful: ${username}`);
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: true, message: 'Login successful' }));
+                    res.end(JSON.stringify({ success: true, message: 'Login successful', role: 'admin' }));
                 } else {
                     console.log(`❌ Failed login attempt: ${username}`);
                     res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -252,6 +284,40 @@ const server = http.createServer(async (req, res) => {
             } catch (e) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ success: false, message: 'Invalid request' }));
+            }
+        });
+        return;
+    }
+
+    // API: Student Login
+    if (req.url === '/api/student/login' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { username, rollNumber, password } = JSON.parse(body);
+                const students = readStudents();
+
+                // Strict Login: All 3 must match
+                const student = students.find(s =>
+                    s.username === username &&
+                    s.password === password &&
+                    // Optional Check: If rollNumber is in DB, it MUST match. If prompt requires it, we enforce it.
+                    (s.rollNumber === rollNumber)
+                );
+
+                if (student) {
+                    console.log(`✅ Student login successful: ${username}`);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: true, student: student }));
+                } else {
+                    console.log(`❌ Failed student login: ${username}`);
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, message: 'Invalid credentials' }));
+                }
+            } catch (e) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ success: false }));
             }
         });
         return;
@@ -285,6 +351,121 @@ const server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({ success: false, error: e.message }));
             }
         });
+        return;
+    }
+
+    // === TESTS API ===
+    if (req.url === '/api/tests' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(readTests()));
+        return;
+    }
+
+    if (req.url === '/api/tests' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const tests = readTests();
+                const newTest = JSON.parse(body);
+
+                // Update if exists, else add
+                const index = tests.findIndex(t => t.id === newTest.id);
+                if (index > -1) {
+                    tests[index] = newTest;
+                } else {
+                    tests.push(newTest);
+                }
+
+                saveTests(tests);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+            } catch (e) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ success: false }));
+            }
+        });
+        return;
+    }
+
+    if (req.url.startsWith('/api/tests') && req.method === 'DELETE') {
+        const id = new URLSearchParams(req.url.split('?')[1]).get('id');
+        const tests = readTests().filter(t => t.id !== id);
+        saveTests(tests);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+        return;
+    }
+
+    // API: Update Student Profile (Avatar)
+    if (req.url === '/api/student/update' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { rollNumber, avatar } = JSON.parse(body);
+                const students = readStudents();
+                const studentIndex = students.findIndex(s => s.rollNumber === rollNumber);
+
+                if (studentIndex > -1) {
+                    students[studentIndex].avatar = avatar; // Save Base64 string
+                    saveStudents(students); // Assuming saveStudents exists or using fs directly
+                    console.log(`🖼️ Updated avatar for ${rollNumber}`);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: true }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, message: 'Student not found' }));
+                }
+            } catch (e) {
+                console.error(e);
+                res.writeHead(400);
+                res.end(JSON.stringify({ success: false }));
+            }
+        });
+        return;
+    }
+
+    // === STUDENTS API ===
+    if (req.url === '/api/students' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(readStudents()));
+        return;
+    }
+
+    if (req.url === '/api/students' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const students = readStudents();
+                const newStudent = JSON.parse(body);
+
+                // Check if student with same roll number exists
+                if (students.some(s => s.rollNumber === newStudent.rollNumber)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, message: 'Student with this Roll Number already exists!' }));
+                    return;
+                }
+
+                students.push(newStudent);
+                saveStudents(students);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+            } catch (e) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ success: false }));
+            }
+        });
+        return;
+    }
+
+    if (req.url.startsWith('/api/students') && req.method === 'DELETE') {
+        const id = new URLSearchParams(req.url.split('?')[1]).get('id'); // using rollNumber as id ideally
+        const students = readStudents().filter(s => s.rollNumber !== id);
+        saveStudents(students);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
         return;
     }
 

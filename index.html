@@ -9,6 +9,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="color.css">
+    <style>
+        /* Override color.css placeholder style for light theme login */
+        .start-card .input-group input::placeholder {
+            color: #9ca3af !important;
+            /* gray-400 */
+            opacity: 1;
+        }
+
+        /* Focus state for inputs */
+        .form-input:focus {
+            border-color: #818cf8 !important;
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .start-card {
+                padding: 25px !important;
+                width: 100% !important;
+            }
+
+            body {
+                padding: 15px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -21,143 +47,48 @@
     <div class="app-container">
         <!-- Start Screen -->
         <div id="startScreen" class="screen active">
-            <div class="card start-card">
-                <div class="logo">☕</div>
-                <h1>Java MCQ Quiz</h1>
-                <p class="subtitle">Test your Java programming knowledge</p>
+            <div class="card start-card"
+                style="max-width: 420px; border-radius: 24px; padding: 40px; background: #fdfdfe; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <h1
+                    style="margin-bottom: 30px; font-size: 1.8rem; color: #1e1b4b; text-align: center; font-weight: 800; letter-spacing: -0.5px;">
+                    Log in to Quiz Portal</h1>
 
-                <div class="stats-preview" id="statsPreview">
-                    <div class="stat">
-                        <span class="stat-value" id="totalQuestions">5</span>
-                        <span class="stat-label">Questions</span>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input type="text" id="username" placeholder="Username" required class="form-input"
+                            style="background: #eff6ff; border: 2px solid #e5e7eb; padding: 16px 20px; border-radius: 12px; font-size: 1rem; width: 100%; color: #334155; outline: none; transition: all 0.2s; text-align: left;">
                     </div>
-                    <div class="stat">
-                        <span class="stat-value" id="totalAttempts">0</span>
-                        <span class="stat-label">Attempts</span>
+
+                    <div class="input-group" style="margin-top: 20px;">
+                        <input type="text" id="rollNumber" placeholder="Roll Number" required class="form-input"
+                            style="background: #eff6ff; border: 2px solid #e5e7eb; padding: 16px 20px; border-radius: 12px; font-size: 1rem; width: 100%; color: #334155; outline: none; transition: all 0.2s; text-align: left;">
                     </div>
-                    <div class="stat">
-                        <span class="stat-value" id="highScore">0</span>
-                        <span class="stat-label">Best Score</span>
+
+                    <div class="input-group" style="margin-top: 20px;">
+                        <input type="password" id="password" placeholder="Password" required class="form-input"
+                            style="background: #eff6ff; border: 2px solid #e5e7eb; padding: 16px 20px; border-radius: 12px; font-size: 1rem; width: 100%; letter-spacing: 1px; color: #334155; outline: none; transition: all 0.2s; text-align: left;">
                     </div>
-                </div>
 
-                <div class="input-group">
-                    <input type="text" id="playerName" placeholder="Enter your name" maxlength="20">
-                </div>
-
-                <button id="startBtn" class="btn btn-primary btn-large">
-                    Start Quiz
-                    <span class="btn-icon">→</span>
-                </button>
-            </div>
-
-        </div>
-
-        <!-- Quiz Screen -->
-        <div id="quizScreen" class="screen">
-            <div class="card quiz-card">
-                <div id="timer" class="timer">30</div>
-                <!-- Progress Bar -->
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                    <span class="progress-text" id="progressText">1/5</span>
-                </div>
-
-                <!-- Question -->
-                <div class="question-container">
-                    <h2 id="questionText" class="question-text">Loading question...</h2>
-                </div>
-
-                <!-- Options -->
-                <div class="options-container" id="optionsContainer">
-                    <button class="option-btn" data-option="A">
-                        <span class="option-letter">A</span>
-                        <span class="option-text" id="optionA">Option A</span>
+                    <button type="submit" id="loginBtn" class="btn btn-primary btn-large"
+                        style="margin-top: 25px; min-width: 140px; width: auto; background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); border-radius: 12px; font-weight: 700; padding: 14px 45px; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5); font-size: 1.1rem; border: none;">
+                        Log in
                     </button>
-                    <button class="option-btn" data-option="B">
-                        <span class="option-letter">B</span>
-                        <span class="option-text" id="optionB">Option B</span>
-                    </button>
-                    <button class="option-btn" data-option="C">
-                        <span class="option-letter">C</span>
-                        <span class="option-text" id="optionC">Option C</span>
-                    </button>
-                    <button class="option-btn" data-option="D">
-                        <span class="option-letter">D</span>
-                        <span class="option-text" id="optionD">Option D</span>
-                    </button>
-                </div>
+                </form>
 
-                <!-- Navigation Buttons -->
-                <div class="navigation-buttons">
-                    <button id="prevBtn" class="btn btn-secondary" style="display: none;">
-                        <span class="btn-icon">←</span> Previous
-                    </button>
-                    <button id="nextBtn" class="btn btn-secondary">
-                        Next Question <span class="btn-icon">→</span>
-                    </button>
+                <div style="margin-top: 20px; text-align: left; padding-left: 5px;">
+                    <a href="#"
+                        style="color: #6366f1; text-decoration: none; font-size: 0.95rem; font-weight: 600;">Lost
+                        password?</a>
                 </div>
             </div>
         </div>
-
-        <!-- Result Screen -->
-        <div id="resultScreen" class="screen">
-            <div class="card result-card">
-                <div class="result-icon" id="resultIcon">🎉</div>
-                <h1 id="resultTitle">Quiz Complete!</h1>
-
-                <div class="result-score">
-                    <div class="score-circle" id="scoreCircle">
-                        <span class="final-score" id="finalScore">0</span>
-                        <span class="score-total" id="scoreTotal">/5</span>
-                    </div>
-                    <p class="score-percent" id="scorePercent">0%</p>
-                </div>
-
-                <div class="result-message" id="resultMessage">
-                    Great effort! Keep practicing to improve.
-                </div>
-
-                <div class="result-buttons">
-                    <button id="reviewBtn" class="btn btn-outline">
-                        📝 Review Answers
-                    </button>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Review Screen -->
-        <div id="reviewScreen" class="screen">
-            <div class="card review-card">
-                <h1>📝 Answer Review</h1>
-                <div id="reviewList" class="review-list"></div>
-                <button id="backToResultBtn" class="btn btn-primary">
-                    ← Back to Results
-                </button>
-            </div>
-        </div>
+    </div>
     </div>
 
     <script src="config.js"></script>
     <script src="script.js"></script>
     <script>
-        // Prevent copying questions
-        const quizScreen = document.getElementById('quizScreen');
-
-        // Disable right-click context menu
-        quizScreen.addEventListener('contextmenu', (e) => e.preventDefault());
-
-        // Disable copy, cut, and select all
-        quizScreen.addEventListener('copy', (e) => e.preventDefault());
-        quizScreen.addEventListener('cut', (e) => e.preventDefault());
-
-        // Disable Ctrl+C, Ctrl+A, Ctrl+X
-        quizScreen.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && (e.key === 'c' || e.key === 'a' || e.key === 'x' || e.key === 'C' || e.key === 'A' || e.key === 'X')) {
-                e.preventDefault();
-            }
-        });
+        // No client-side scripts needed for login page beyond script.js
     </script>
 </body>
 

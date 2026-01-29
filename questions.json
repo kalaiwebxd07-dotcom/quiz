@@ -3,29 +3,49 @@
     "question": "What is the correct way to declare a variable in Java?",
     "options": {
       "A": "int x;",
-      "B": "var x : int;",
-      "C": "declare x as int;",
-      "D": "x int;"
+      "B": "variable x int;",
+      "C": "declare x int;",
+      "D": "x: int;"
     },
     "answer": "A"
   },
   {
-    "question": "Which of the following is NOT a valid Java access modifier?",
+    "question": "Which of the following is a valid way to create an object of the String class?",
     "options": {
-      "A": "public",
-      "B": "private",
-      "C": "protected",
-      "D": "secure"
+      "A": "String s = new String();",
+      "B": "String s = String();",
+      "C": "String s = 'Hello';",
+      "D": "String s = new String('Hello');"
     },
     "answer": "D"
   },
   {
-    "question": "What will be the output of the following code snippet? \n\nfor(int i = 0; i < 5; i++) { System.out.print(i + ' '); }",
+    "question": "What will be the output of the following code: System.out.println(5 + 3 + '8');?",
     "options": {
-      "A": "0 1 2 3 4 ",
-      "B": "1 2 3 4 5 ",
-      "C": "0 1 2 3 4 5 ",
-      "D": "Compilation error"
+      "A": "58",
+      "B": "88",
+      "C": "Error",
+      "D": "13"
+    },
+    "answer": "A"
+  },
+  {
+    "question": "Which keyword is used to inherit a class in Java?",
+    "options": {
+      "A": "extends",
+      "B": "inherits",
+      "C": "implements",
+      "D": "super"
+    },
+    "answer": "A"
+  },
+  {
+    "question": "What is the time complexity of accessing an element in an ArrayList?",
+    "options": {
+      "A": "O(1)",
+      "B": "O(n)",
+      "C": "O(log n)",
+      "D": "O(n^2)"
     },
     "answer": "A"
   }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Java Quiz</title>
+    <title>Admin Panel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,552 +18,982 @@
         body {
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            padding: 20px;
+            background: #f3f4f6;
+            color: #1f2937;
         }
 
-        @keyframes gradientShift {
+        /* Variables */
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #06b6d4;
+            --accent: #f43f5e;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
 
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
+            --difficulty-easy: #10b981;
+            --difficulty-medium: #f59e0b;
+            --difficulty-hard: #ef4444;
         }
 
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .nav-links {
+        /* Header */
+        header {
+            background: white;
+            padding: 15px 30px;
             display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
 
-        .tab-btn {
-            flex: 1;
-            padding: 15px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
             border: none;
-            border-radius: 12px;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .tab-btn.active {
+        .btn-outline {
             background: white;
-            color: #764ba2;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-700);
         }
 
-        .tab-btn:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.2);
+        .btn-outline:hover {
+            background: var(--gray-100);
         }
 
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: #ffedd5;
+            color: #ea580c;
+        }
+
+        .btn-danger:hover {
+            background: #fed7aa;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 15px 0;
+            color: var(--gray-500);
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Tab Content */
         .tab-content {
             display: none;
         }
 
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Cards */
         .card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
 
-        .card-title {
-            color: white;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title {
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
         }
 
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        /* Lists */
+        .list-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            transition: box-shadow 0.2s;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .list-item:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .form-group label {
-            display: block;
-            color: rgba(255, 255, 255, 0.9);
+        .list-item-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
             margin-bottom: 6px;
-            font-weight: 500;
+            color: #111827;
+        }
+
+        .list-item-meta {
+            color: var(--gray-500);
             font-size: 0.9rem;
         }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
+        span.status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
         }
 
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+        span.active-status {
+            color: #10b981;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #06b6d4;
+        .action-buttons {
+            display: flex;
+            gap: 12px;
         }
 
-        .btn {
-            padding: 12px 25px;
-            font-size: 0.95rem;
+        /* Specific Button Styles from screenshot */
+        .btn-action-outline {
+            padding: 8px 16px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            color: var(--gray-700);
+            border-radius: 8px;
             font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            color: white;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-group {
+            font-size: 0.9rem;
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* List Items */
-        .list-item {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 4px solid #06b6d4;
-        }
-
-        .list-item.wrong {
-            border-left-color: #ef4444;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .item-title {
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .item-meta {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
-        }
-
-        .item-actions {
-            display: flex;
+            align-items: center;
             gap: 8px;
         }
 
-        .item-actions button {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border-radius: 6px;
+        .btn-action-outline:hover {
+            background: var(--gray-100);
         }
 
-        .options-preview {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .btn-delete {
+            padding: 8px;
+            background: #ff5252;
+            /* Bright Red/Orange */
+            color: white;
+            border-radius: 8px;
+            border: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(255, 82, 82, 0.2);
+        }
+
+        .btn-delete:hover {
+            background: #ff1744;
+        }
+
+        /* Modal Styles matching screenshot */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 900px;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Form Grid Layout */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            color: #374151;
+            outline: none;
+        }
+
+        .form-input-area {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            color: #374151;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-input:focus,
+        .form-input-area:focus {
+            border-color: var(--primary);
+        }
+
+        .section-separator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0 20px 0;
+            color: #111827;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .section-separator::before,
+        .section-separator::after {
+            content: '';
+            height: 1px;
+            flex: 1;
+            background: var(--gray-200);
+        }
+
+        .section-separator-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .checkbox-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #06b6d4;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        input[type="checkbox"]:checked+.checkbox-custom {
+            background: #06b6d4;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Difficulty Buttons */
+        .difficulty-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .btn-difficulty {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
             gap: 6px;
-            margin-top: 10px;
+            flex: 1;
+            justify-content: center;
         }
 
-        .option-preview {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.05);
+        .btn-difficulty.selected.easy {
+            background: #d1fae5;
+            border-color: var(--difficulty-easy);
+            color: #065f46;
         }
 
-        .option-preview.correct {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
+        .btn-difficulty.selected.medium {
+            background: #fef3c7;
+            border-color: var(--difficulty-medium);
+            color: #92400e;
         }
 
+        .btn-difficulty.selected.hard {
+            background: #fee2e2;
+            border-color: var(--difficulty-hard);
+            color: #991b1b;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.easy {
+            background: var(--difficulty-easy);
+        }
+
+        .dot.medium {
+            background: var(--difficulty-medium);
+        }
+
+        .dot.hard {
+            background: var(--difficulty-hard);
+        }
+
+        /* Questions View Layout */
+        .split-view {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .left-pane {
+            flex: 1;
+        }
+
+        .right-pane {
+            flex: 1;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 30px;
+            height: 100%;
+        }
+
+        .preview-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        /* Student Manager */
+        .add-student-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .add-student-row input {
+            flex: 1;
+        }
+
+        /* Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
             text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            color: white;
+            color: #8b5cf6;
+            margin-bottom: 5px;
         }
 
         .stat-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-        }
-
-        .result-item {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .result-name {
-            color: white;
-            font-weight: 600;
-        }
-
-        .result-score {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .result-score.high {
-            background: rgba(16, 185, 129, 0.3);
-            color: #10b981;
-        }
-
-        .result-score.medium {
-            background: rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-        }
-
-        .result-score.low {
-            background: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-
-        .result-meta {
-            color: rgba(255, 255, 255, 0.5);
+            color: #6b7280;
             font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Sort Buttons */
-        .sort-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .sort-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .sort-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
         }
 
-        .sort-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            color: white;
+        /* Mobile Responsive Styles */
+        @media (max-width: 992px) {
+            .split-view {
+                flex-direction: column;
+            }
+
+            .left-pane,
+            .right-pane {
+                width: 100%;
+            }
+
+            .preview-card {
+                position: static;
+                /* Remove sticky if any */
+                margin-top: 20px;
+            }
         }
 
-        .sort-btn.active {
-            background: linear-gradient(135deg, #06b6d4, #6366f1);
-            border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        @media (max-width: 768px) {
+
+            /* General */
+            .container {
+                padding: 0 15px;
+            }
+
+            /* Header */
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            /* Tabs */
+            .tabs {
+                gap: 15px;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab {
+                white-space: nowrap;
+                font-size: 0.9rem;
+                padding: 10px 0;
+            }
+
+            /* Forms */
+            .form-row,
+            .add-student-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .add-student-row input {
+                width: 100%;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            /* Stats */
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            /* Lists */
+            .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            /* Modals */
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+                padding: 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            /* Section Headers */
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .section-header button {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
-        .sort-btn.active:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-        }
-
-        .sort-icon {
-            font-size: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .sort-btn:hover .sort-icon {
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 600px) {
-
-            .form-grid,
-            .options-preview,
+        /* Small Mobile */
+        @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
 
-            .tabs {
+            .header-actions {
                 flex-direction: column;
+            }
+
+            .header-actions button {
+                width: 100%;
+                margin-bottom: 5px;
+                justify-content: center;
+            }
+
+            .difficulty-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="admin-container">
-        <div class="header">
-            <h1>⚙️ Admin Panel</h1>
-            <div class="nav-links">
-                <a href="index.html">🎮 Take Quiz</a>
-                <a href="#" onclick="logout()">🚪 Logout</a>
-            </div>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            ⚙️ <span>Admin Panel</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.location.href='index.html'">🎮 Take Quiz</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation -->
+        <div class="tabs" id="mainTabs">
+            <div class="tab active" onclick="switchTab('tests')">📋 Test Manager</div>
+            <div class="tab" onclick="switchTab('students')">🎓 Student Manager</div>
+            <div class="tab" onclick="switchTab('results')">📊 Results Manager</div>
+            <div class="tab" onclick="switchTab('settings')">⚙️ Settings</div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('questions')">📝 Question Manager</button>
-            <button class="tab-btn" onclick="showTab('results')">📊 Results Manager</button>
-            <button class="tab-btn" onclick="showTab('settings')">⚙️ Settings</button>
-        </div>
-
-        <!-- Question Manager Tab -->
-        <div id="questionsTab" class="tab-content active">
-            <!-- Add/Edit Form -->
+        <!-- Test Manager -->
+        <div id="testsTab" class="tab-content active">
             <div class="card">
-                <div class="card-title" id="formTitle">➕ Add New Question</div>
-                <div class="form-group full-width">
-                    <label>Question</label>
-                    <input type="text" id="questionText" placeholder="Enter your question...">
+                <div class="section-header">
+                    <div class="section-title">📋 Tests</div>
+                    <button class="btn btn-primary" onclick="createNewTest()">+ Create New Test</button>
                 </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Option A</label>
-                        <input type="text" id="optionA" placeholder="Option A">
-                    </div>
-                    <div class="form-group">
-                        <label>Option B</label>
-                        <input type="text" id="optionB" placeholder="Option B">
-                    </div>
-                    <div class="form-group">
-                        <label>Option C</label>
-                        <input type="text" id="optionC" placeholder="Option C">
-                    </div>
-                    <div class="form-group">
-                        <label>Option D</label>
-                        <input type="text" id="optionD" placeholder="Option D">
-                    </div>
+                <div id="testsList">
+                    <!-- Tests rendered here -->
                 </div>
-                <div class="form-group">
-                    <label>Correct Answer</label>
-                    <select id="correctAnswer">
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                    </select>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="saveBtn" onclick="saveQuestion()">💾 Save Question</button>
-                    <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()"
-                        style="display:none;">Cancel</button>
-                    <button class="btn btn-primary" onclick="generateWithAI()">🤖 Generate with AI</button>
+            </div>
+        </div>
+
+        <!-- Questions Manager (Hidden by default, shown when specific test selected) -->
+        <div id="questionsView" style="display: none;">
+            <div class="view-header">
+                <div class="section-title">📝 Questions for: <span id="qTestName">...</span></div>
+                <div class="header-actions">
+                    <button class="btn btn-outline" style="color: #f59e0b; border-color: #f59e0b;">📁 Bulk
+                        Import</button>
+                    <button class="btn btn-outline" onclick="closeQuestionsView()">← Back to Tests</button>
                 </div>
             </div>
 
+            <div class="split-view">
+                <!-- Left Pane: Input -->
+                <div class="left-pane card">
+                    <div class="section-title" style="margin-bottom: 20px;">+ Add Question</div>
+
+                    <!-- Template Selector -->
+                    <div class="input-group">
+                        <select class="form-input" style="color: #6b7280;">
+                            <option>📄 Standard Template</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="form-label">Question *</label>
+                        <textarea id="qText" class="form-input-area" placeholder="Enter your question..."
+                            oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="form-label">Difficulty</label>
+                        <div class="difficulty-group">
+                            <div class="btn-difficulty" id="diffEasy" onclick="setDiff('easy')"><span
+                                    class="dot easy"></span> Easy</div>
+                            <div class="btn-difficulty" id="diffMed" onclick="setDiff('medium')"><span
+                                    class="dot medium"></span> Medium</div>
+                            <div class="btn-difficulty" id="diffHard" onclick="setDiff('hard')"><span
+                                    class="dot hard"></span> Hard</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="form-label">Option A *</label>
+                        <input type="text" id="optA" class="form-input" placeholder="Option A"
+                            oninput="updatePreview()">
+                    </div>
+                    <div class="input-group">
+                        <label class="form-label">Option B *</label>
+                        <input type="text" id="optB" class="form-input" placeholder="Option B"
+                            oninput="updatePreview()">
+                    </div>
+                    <div class="input-group">
+                        <label class="form-label">Option C *</label>
+                        <input type="text" id="optC" class="form-input" placeholder="Option C"
+                            oninput="updatePreview()">
+                    </div>
+                    <div class="input-group">
+                        <label class="form-label">Option D *</label>
+                        <input type="text" id="optD" class="form-input" placeholder="Option D"
+                            oninput="updatePreview()">
+                    </div>
+
+                    <div style="margin: 20px 0;">
+                        <a href="#"
+                            style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: block; margin-bottom: 10px;">▶
+                            💻 Add Code Snippet (Optional)</a>
+                        <a href="#"
+                            style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: block;">▶
+                            🖼 Add Image (Optional)</a>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="form-label">Correct Answer:</label>
+                        <select id="correctOpt" class="form-input">
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+
+                    <div class="header-actions" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveQuestion()">💾 Save Question</button>
+                        <button class="btn btn-outline" onclick="generateAI()">🤖 Generate with AI</button>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Preview -->
+                <div class="right-pane preview-card">
+                    <div class="preview-label">
+                        👁 Live Preview <span id="previewDiffBadge"
+                            style="background:#d1fae5; color:#065f46; padding: 4px 10px; border-radius:12px; font-size: 0.75rem;">Easy</span>
+                    </div>
+                    <div id="previewContent" style="color: #6b7280; font-style: italic;">
+                        Start typing to see preview...
+                    </div>
+                </div>
+            </div>
             <!-- Questions List -->
-            <div class="card">
-                <div class="card-title">📋 Questions (<span id="questionCount">0</span>)</div>
-                <div id="questionsList"></div>
+            <div id="questionsList" style="margin-top: 30px;">
+                <!-- Questions rendered here -->
             </div>
         </div>
 
-        <!-- Results Manager Tab -->
+        <!-- Student Manager -->
+        <div id="studentsTab" class="tab-content">
+            <div class="card">
+                <div class="section-title" style="margin-bottom: 20px;">+ Add Student</div>
+                <div class="add-student-row">
+                    <input type="text" id="newStudentName" class="form-input" placeholder="Student Name">
+                    <input type="text" id="newRoll" class="form-input" placeholder="Roll Number">
+                </div>
+                <button class="btn btn-primary" style="margin: 0 auto; display: block;" onclick="addStudent()">Add
+                    Student</button>
+            </div>
+
+            <div class="card">
+                <div class="section-title" style="margin-bottom: 20px;">🎓 Students List</div>
+                <div id="studentsList">
+                    <!-- Students rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Manager -->
         <div id="resultsTab" class="tab-content">
             <!-- Stats -->
-            <div class="stats-grid" id="statsGrid">
+            <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="statAttempts">0</div>
                     <div class="stat-label">Total Attempts</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="statAverage">0</div>
+                    <div class="stat-value" id="statAvg">0</div>
                     <div class="stat-label">Average Score</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="statHighest">0</div>
+                    <div class="stat-value" id="statHigh">0</div>
                     <div class="stat-label">Highest Score</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="statLowest">0</div>
+                    <div class="stat-value" id="statLow">0</div>
                     <div class="stat-label">Lowest Score</div>
                 </div>
             </div>
 
-            <!-- Results List -->
             <div class="card">
-                <div class="card-title" style="flex-wrap: wrap; gap: 10px;">
-                    📊 All Results
-
-                    <div class="sort-controls" style="margin-left: auto; margin-bottom: 0;">
-                        <button class="sort-btn" id="sortAscBtn" onclick="sortResults('asc')">
-                            <span class="sort-icon">▲</span> Lowest
-                        </button>
-                        <button class="sort-btn active" id="sortDescBtn" onclick="sortResults('desc')">
-                            <span class="sort-icon">▼</span> Highest
-                        </button>
-                        <button class="btn btn-danger" style="padding: 8px 15px; font-size: 0.85rem;"
-                            onclick="clearAllResults()">🗑️ Clear All</button>
+                <div class="section-header">
+                    <div class="section-title">📊 All Results</div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="sortResults('desc')">Highest</button>
+                        <button class="btn btn-outline" onclick="sortResults('asc')">Lowest</button>
+                        <button class="btn btn-action-outline" onclick="clearResults()"
+                            style="border-color: #fca5a5; color: #dc2626;">🗑 Clear All</button>
                     </div>
                 </div>
-
-                <div id="resultsList"></div>
+                <div id="resultsList">
+                    <!-- Results rendered here -->
+                </div>
             </div>
         </div>
 
-        <!-- Settings Tab -->
+        <!-- Settings -->
         <div id="settingsTab" class="tab-content">
             <div class="card">
-                <div class="card-title">⚙️ Quiz Settings</div>
-                <div class="form-group">
-                    <label>Quiz Duration (in minutes)</label>
-                    <input type="number" id="quizDuration" placeholder="e.g. 10" min="1" max="120">
-                    <small style="color: rgba(255,255,255,0.5); display: block; margin-top: 5px;">
-                        Set the detailed time allowed for the entire quiz.
-                    </small>
+                <div class="section-title" style="margin-bottom: 20px;">⚙️ Quiz Settings</div>
+                <div class="input-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Quiz Duration (in
+                        minutes)</label>
+                    <input type="number" id="quizDuration" class="form-input" placeholder="e.g. 30">
+                    <small style="display: block; margin-top: 5px; color: #6b7280;">Set the time allowed for the entire
+                        quiz.</small>
                 </div>
                 <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
             </div>
         </div>
     </div>
 
+    <!-- Create Test Modal -->
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">+ Create New Test</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Test Name</label>
+                    <input type="text" id="testName" class="form-input" placeholder="e.g., Java Fundamentals Quiz">
+                </div>
+                <div class="form-col">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" id="testDuration" class="form-input" placeholder="10">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Description</label>
+                    <input type="text" id="testDesc" class="form-input" placeholder="Brief description of the test">
+                </div>
+            </div>
+
+            <div class="section-separator">
+                <div class="section-separator-text">🗓 Scheduling</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label">Start Date & Time</label>
+                    <input type="datetime-local" id="testStart" class="form-input">
+                </div>
+                <div class="form-col">
+                    <label class="form-label">End Date & Time</label>
+                    <input type="datetime-local" id="testEnd" class="form-input">
+                </div>
+            </div>
+            <div
+                style="text-align: center; color: var(--gray-500); font-size: 0.85rem; margin-top: -10px; margin-bottom: 20px;">
+                Leave empty for always available
+            </div>
+
+            <div class="section-separator">
+                <div class="section-separator-text">⚙️ Options</div>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="checkShuffle" checked>
+                    <div class="checkbox-custom">✓</div>
+                    Shuffle Questions
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="checkResults" checked>
+                    <div class="checkbox-custom">✓</div>
+                    Show Results Immediately
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="checkActive" checked>
+                    <div class="checkbox-custom">✓</div>
+                    Active
+                </label>
+            </div>
+
+            <div class="form-row" style="margin-top: 20px; justify-content: center;">
+                <div style="text-align: center;">
+                    <label class="form-label">Max Attempts (0 = unlimited)</label>
+                    <input type="number" id="testAttempts" class="form-input" value="0"
+                        style="width: 100px; text-align: center;">
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 30px; gap: 15px;">
+                <button class="btn btn-primary" style="flex: 1; justify-content: center; padding: 14px;"
+                    onclick="saveTest()">💾 Save Test</button>
+                <button class="btn btn-outline" style="flex: 1; justify-content: center; padding: 14px;"
+                    onclick="closeTestModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script>
-        // Check auth
+        // --- Auth Check ---
         if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
             window.location.href = 'login.html';
         }
@@ -573,318 +1003,629 @@
             window.location.href = 'login.html';
         }
 
-        let questions = [];
-        let results = { statistics: {}, results: [] };
-        let editingIndex = -1;
-        let currentSortOrder = 'desc'; // Default sort order (highest scores first)
+        // --- Global State ---
+        let currentTestId = null;
+        let editingTestId = null; // Track which test is being edited
+        let currentDifficulty = 'easy';
 
-        // Tab switching
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
+        // --- Tabs ---
+        function switchTab(tabId) {
+            // 1. Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
 
-            if (tabName === 'results') loadResults();
-            if (tabName === 'settings') loadSettings();
+            // 2. Hide all content sections clearly
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.style.display = ''; // Clear any inline styles that might persist
+            });
+
+            // 3. Activate selected tab
+            const clickedTab = event.target.closest('.tab') || document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`);
+            if (clickedTab) clickedTab.classList.add('active');
+
+            // 4. Activate selected content
+            const content = document.getElementById(tabId + 'Tab');
+            if (content) {
+                content.classList.add('active');
+            }
+
+            // 5. Special handling for Questions View
+            const qView = document.getElementById('questionsView');
+            if (qView) qView.style.display = 'none';
+
+            if (tabId === 'tests') {
+                // If clicking "Test Manager" while in questions view, it effectively resets to list
+                const testsTab = document.getElementById('testsTab');
+                if (testsTab) testsTab.style.display = 'block';
+            }
+
+            if (tabId === 'tests') loadTests();
+            if (tabId === 'students') loadStudents();
+            if (tabId === 'results') loadResults();
+            if (tabId === 'settings') loadSettings();
         }
 
-        // ... existing code ...
+        const API_URL = 'http://localhost:8080/api';
 
-        // === SETTINGS ===
-        async function loadSettings() {
+        // --- Tests Manager ---
+        let allTests = [];
+
+        async function loadTests() {
             try {
-                const response = await fetch(getApiUrl('/api/settings'));
-                if (response.ok) {
-                    const settings = await response.json();
-                    document.getElementById('quizDuration').value = settings.duration || 10;
-                }
-            } catch (e) {
-                console.error('Failed to load settings');
-            }
-        }
+                const res = await fetch(`${API_URL}/tests`);
+                allTests = await res.json();
+                const list = document.getElementById('testsList');
+                list.innerHTML = allTests.map(t => {
+                    // Calculate status dynamically
+                    const now = new Date();
+                    let isClosed = false;
+                    if (t.end) {
+                        const endTime = new Date(t.end);
+                        if (now > endTime) isClosed = true;
+                    }
 
-        async function saveSettings() {
-            const duration = document.getElementById('quizDuration').value;
-            if (duration < 1 || duration > 120) {
-                alert('Please enter a valid duration (1-120 minutes)');
-                return;
-            }
+                    // Effective status and color
+                    const displayStatus = isClosed ? 'Closed' : (t.status || 'Active');
+                    const dotColor = (displayStatus === 'Active') ? '#10b981' : '#ef4444'; // Green or Red
 
-            try {
-                const response = await fetch(getApiUrl('/api/settings'), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ duration: parseInt(duration) })
-                });
-
-                if (response.ok) {
-                    alert('Settings saved successfully!');
-                } else {
-                    alert('Failed to save settings');
-                }
-            } catch (e) {
-                alert('Error connecting to server');
-            }
-        }
-
-        // === QUESTIONS ===
-        async function loadQuestions() {
-            try {
-                const response = await fetch(getApiUrl('/api/questions'));
-                if (response.ok) {
-                    questions = await response.json();
-                    renderQuestions();
-                }
-            } catch (e) {
-                document.getElementById('questionsList').innerHTML = '<div class="empty-state">Server not running</div>';
-            }
-        }
-
-        async function saveQuestionsToServer() {
-            try {
-                const response = await fetch(getApiUrl('/api/questions'), {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(questions)
-                });
-                return response.ok;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function renderQuestions() {
-            document.getElementById('questionCount').textContent = questions.length;
-            const container = document.getElementById('questionsList');
-
-            if (questions.length === 0) {
-                container.innerHTML = '<div class="empty-state">No questions yet</div>';
-                return;
-            }
-
-            container.innerHTML = questions.map((q, i) => `
-                <div class="list-item">
-                    <div class="item-header">
-                        <div class="item-title">Q${i + 1}: ${q.question}</div>
-                        <div class="item-actions">
-                            <button class="btn btn-secondary" onclick="editQuestion(${i})">✏️</button>
-                            <button class="btn btn-danger" onclick="deleteQuestion(${i})">🗑️</button>
-                        </div>
+                    return `
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>${t.title}</h3>
+                    <div class="list-item-meta">
+                        ${t.description || 'No description'} • ${t.duration} min • ${t.start ? 'Starts: ' + t.start : 'Always available'} • 
+                        <span class="active-status" style="color: ${dotColor}; font-weight: 500;">
+                            <span class="status-dot" style="background-color: ${dotColor};"></span> ${displayStatus}
+                        </span>
                     </div>
-                    <div class="options-preview">
-                        <div class="option-preview ${q.answer === 'A' ? 'correct' : ''}">A. ${q.options.A}</div>
-                        <div class="option-preview ${q.answer === 'B' ? 'correct' : ''}">B. ${q.options.B}</div>
-                        <div class="option-preview ${q.answer === 'C' ? 'correct' : ''}">C. ${q.options.C}</div>
-                        <div class="option-preview ${q.answer === 'D' ? 'correct' : ''}">D. ${q.options.D}</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-action-outline" onclick="manageQuestions('${t.id}')">✏️ Questions</button>
+                    <button class="btn-action-outline" onclick="editTest('${t.id}')">🖊</button>
+                    <button class="btn-delete" onclick="deleteTest('${t.id}')">🗑</button>
+                </div>
+            </div>
+            `;
+                }).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        function resetTestForm() {
+            editingTestId = null;
+            document.getElementById('testName').value = '';
+            document.getElementById('testDesc').value = '';
+            document.getElementById('testDuration').value = '';
+            document.getElementById('testStart').value = '';
+            document.getElementById('testEnd').value = '';
+            document.getElementById('testAttempts').value = '0';
+            document.getElementById('checkShuffle').checked = true;
+            document.getElementById('checkResults').checked = true;
+            document.getElementById('checkActive').checked = true;
+        }
+
+        function createNewTest() {
+            resetTestForm();
+            document.querySelector('.modal-title').innerText = '+ Create New Test';
+            openTestModal();
+        }
+
+        function openTestModal() { document.getElementById('testModal').style.display = 'flex'; }
+        function closeTestModal() { document.getElementById('testModal').style.display = 'none'; }
+        async function saveTest() {
+            const title = document.getElementById('testName').value;
+            const desc = document.getElementById('testDesc').value;
+            const duration = document.getElementById('testDuration').value;
+
+            // Scheduling
+            const startStr = document.getElementById('testStart').value;
+            const endStr = document.getElementById('testEnd').value;
+
+            // Options
+            const shuffle = document.getElementById('checkShuffle').checked;
+            const showResults = document.getElementById('checkResults').checked;
+            const isActive = document.getElementById('checkActive').checked;
+            const attempts = document.getElementById('testAttempts').value;
+
+            if (!title) return alert('Test Name required');
+
+            // Determine ID: Use existing if editing, else generate unique one
+            let id = editingTestId;
+            if (!id) {
+                // Generate unique ID using timestamp and random string
+                id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            }
+
+            // If editing, preserve existing questions
+            let questions = [];
+            if (editingTestId) {
+                const existingTest = allTests.find(t => t.id === editingTestId);
+                if (existingTest) {
+                    questions = existingTest.questions || [];
+                }
+            }
+
+            const test = {
+                id: id,
+                title,
+                description: desc,
+                duration: parseInt(duration) || 10,
+                status: isActive ? 'Active' : 'Inactive',
+                start: startStr,
+                end: endStr,
+                options: {
+                    shuffle,
+                    showResults,
+                    maxAttempts: parseInt(attempts) || 0
+                },
+                questions: questions
+            };
+
+            await fetch(`${API_URL}/tests`, {
+                method: 'POST',
+                body: JSON.stringify(test)
+            });
+
+            closeTestModal();
+            resetTestForm(); // Clear form and state
+            loadTests();
+        }
+
+        async function deleteTest(id) {
+            if (confirm('Delete this test?')) {
+                await fetch(`${API_URL}/tests?id=${id}`, { method: 'DELETE' });
+                loadTests();
+            }
+        }
+
+        function editTest(id) {
+            const test = allTests.find(t => t.id === id);
+            if (!test) return;
+
+            editingTestId = id; // Set ID being edited
+
+            document.querySelector('.modal-title').innerText = '🖊 Edit Test';
+            document.getElementById('testName').value = test.title;
+            document.getElementById('testDesc').value = test.description || '';
+            document.getElementById('testDuration').value = test.duration;
+            document.getElementById('testStart').value = test.start || '';
+            document.getElementById('testEnd').value = test.end || '';
+
+            // Populate other fields if needed, e.g. Max Attempts
+            if (test.options) {
+                document.getElementById('testAttempts').value = test.options.maxAttempts || 0;
+                document.getElementById('checkShuffle').checked = test.options.shuffle;
+                document.getElementById('checkResults').checked = test.options.showResults;
+            }
+            document.getElementById('checkActive').checked = test.status === 'Active';
+
+            openTestModal();
+        }
+
+        // --- Question Manager ---
+
+        function manageQuestions(testId) {
+            const test = allTests.find(t => t.id === testId);
+            if (!test) return;
+
+            currentTestId = testId;
+            document.getElementById('qTestName').innerText = test.title;
+
+            // Hide list, show view
+            document.getElementById('testsTab').style.display = 'none';
+            document.getElementById('questionsView').style.display = 'block';
+
+            // Reset form
+            resetQuestionForm();
+
+            // Render existing questions
+            renderQuestionsList(test.questions);
+        }
+
+        function closeQuestionsView() {
+            document.getElementById('questionsView').style.display = 'none';
+            document.getElementById('testsTab').style.display = 'block';
+            currentTestId = null;
+            loadTests(); // Refresh in case stats changed
+        }
+
+        function setDiff(level) {
+            currentDifficulty = level;
+            document.querySelectorAll('.btn-difficulty').forEach(b => b.classList.remove('selected'));
+            document.getElementById('diff' + (level.charAt(0).toUpperCase() + level.slice(1).replace('ium', 'Med'))).classList.add('selected');
+
+            const badges = {
+                'easy': { bg: '#d1fae5', col: '#065f46', txt: 'Easy' },
+                'medium': { bg: '#fef3c7', col: '#92400e', txt: 'Medium' },
+                'hard': { bg: '#fee2e2', col: '#991b1b', txt: 'Hard' }
+            };
+
+            const badge = document.getElementById('previewDiffBadge');
+            badge.style.background = badges[level].bg;
+            badge.style.color = badges[level].col;
+            badge.innerText = badges[level].txt;
+        }
+
+        function updatePreview() {
+            const q = document.getElementById('qText').value;
+            const a = document.getElementById('optA').value;
+            const b = document.getElementById('optB').value;
+            const c = document.getElementById('optC').value;
+            const d = document.getElementById('optD').value;
+
+            if (!q) {
+                document.getElementById('previewContent').innerHTML = '<span style="color: #6b7280; font-style: italic;">Start typing to see preview...</span>';
+                return;
+            }
+
+            let html = `<div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; color: #111827;">${q}</div>`;
+
+            const opts = [a, b, c, d].filter(o => o);
+            opts.forEach((opt, i) => {
+                html += `
+                      <div style="padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; background: #f9fafb;">
+                          <span style="font-weight: 600; color: #6b7280; margin-right: 10px;">${String.fromCharCode(65 + i)}</span> ${opt}
+                      </div>
+                  `;
+            });
+
+            document.getElementById('previewContent').innerHTML = html;
+        }
+
+        function resetQuestionForm() {
+            editingQuestionIndex = null;
+            document.getElementById('qText').value = '';
+            document.getElementById('optA').value = '';
+            document.getElementById('optB').value = '';
+            document.getElementById('optC').value = '';
+            document.getElementById('optD').value = '';
+            document.getElementById('correctOpt').value = 'A';
+
+            setDiff('easy');
+            updatePreview();
+
+            // Reset headers and buttons
+            document.querySelector('#questionsView .section-title').innerText = '+ Add Question';
+            document.querySelector('#questionsView .btn-primary').innerText = '💾 Save Question';
+        }
+
+        let editingQuestionIndex = null;
+
+        async function saveQuestion() {
+            if (!currentTestId) return;
+
+            const question = {
+                question: document.getElementById('qText').value,
+                options: {
+                    A: document.getElementById('optA').value,
+                    B: document.getElementById('optB').value,
+                    C: document.getElementById('optC').value,
+                    D: document.getElementById('optD').value
+                },
+                answer: document.getElementById('correctOpt').value,
+                difficulty: currentDifficulty
+            };
+
+            if (!question.question || !question.options.A || !question.options.B) return alert('Fill required fields');
+
+            const test = allTests.find(t => t.id === currentTestId);
+            if (!test.questions) test.questions = [];
+
+            if (editingQuestionIndex !== null) {
+                // Update existing
+                test.questions[editingQuestionIndex] = question;
+                editingQuestionIndex = null;
+            } else {
+                // Add new
+                test.questions.push(question);
+            }
+
+            await fetch(`${API_URL}/tests`, {
+                method: 'POST',
+                body: JSON.stringify(test)
+            });
+
+            alert(editingQuestionIndex !== null ? 'Question Updated!' : 'Question Added!');
+            resetQuestionForm();
+            renderQuestionsList(test.questions);
+        }
+
+        function editQuestion(index) {
+            const test = allTests.find(t => t.id === currentTestId);
+            if (!test || !test.questions[index]) return;
+
+            const q = test.questions[index];
+            editingQuestionIndex = index;
+
+            document.getElementById('qText').value = q.question;
+            document.getElementById('optA').value = q.options.A || q.options[0] || ''; // Fallback for old data
+            document.getElementById('optB').value = q.options.B || q.options[1] || '';
+            document.getElementById('optC').value = q.options.C || q.options[2] || '';
+            document.getElementById('optD').value = q.options.D || q.options[3] || '';
+            document.getElementById('correctOpt').value = q.answer;
+            setDiff(q.difficulty || 'easy');
+
+            document.querySelector('#questionsView .section-title').innerText = '✏️ Edit Question';
+            document.querySelector('#questionsView .btn-primary').innerText = '💾 Update Question';
+
+            updatePreview();
+
+            // Scroll to top
+            document.querySelector('.left-pane').scrollTop = 0;
+        }
+
+        async function generateAI() {
+            const topic = prompt("Enter topic for question (e.g. Java Loops):");
+            if (!topic) return;
+
+            const btn = document.querySelector('button[onclick="generateAI()"]');
+            const originalText = btn.innerText;
+            btn.innerText = '⏳ Generating...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/generate`, {
+                    method: 'POST',
+                    body: JSON.stringify({ topic, count: 1 })
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.questions && data.questions.length > 0) {
+                    const q = data.questions[0];
+                    document.getElementById('qText').value = q.question;
+                    document.getElementById('optA').value = q.options.A;
+                    document.getElementById('optB').value = q.options.B;
+                    document.getElementById('optC').value = q.options.C;
+                    document.getElementById('optD').value = q.options.D;
+                    document.getElementById('correctOpt').value = q.answer;
+
+                    updatePreview();
+                    alert(`Generated question about "${topic}"!`);
+                } else {
+                    alert('Failed to generate question: ' + (data.message || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error connecting to AI service');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+
+
+        }
+
+        function renderQuestionsList(questions) {
+            const list = document.getElementById('questionsList');
+            if (!questions || questions.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:#6b7280; padding:20px;">No questions added yet.</div>';
+                return;
+            }
+
+            list.innerHTML = questions.map((q, i) => `
+                <div class="card" style="margin-bottom: 15px; border-left: 4px solid var(--primary);">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <div style="margin-bottom: 10px;">
+                                <span style="font-weight:700; color:var(--primary); margin-right:8px;">#${i + 1}</span>
+                                <span class="badge ${q.difficulty || 'easy'}">${(q.difficulty || 'easy').toUpperCase()}</span>
+                            </div>
+                            <h3 style="margin: 0 0 15px 0; font-size: 1.1rem;">${q.question}</h3>
+                            
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.95rem; color: #4b5563;">
+                                <div style="${q.answer === 'A' ? 'color:#10b981; font-weight:600;' : ''}">A: ${q.options.A}</div>
+                                <div style="${q.answer === 'B' ? 'color:#10b981; font-weight:600;' : ''}">B: ${q.options.B}</div>
+                                <div style="${q.answer === 'C' ? 'color:#10b981; font-weight:600;' : ''}">C: ${q.options.C}</div>
+                                <div style="${q.answer === 'D' ? 'color:#10b981; font-weight:600;' : ''}">D: ${q.options.D}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-outline" style="padding: 6px 12px;" onclick="editQuestion(${i})">✏️ Edit</button>
+                            <button class="btn-delete" style="width:auto; padding: 6px 12px;" onclick="deleteQuestion(${i})">🗑</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        async function saveQuestion() {
-            const questionText = document.getElementById('questionText').value.trim();
-            const optionA = document.getElementById('optionA').value.trim();
-            const optionB = document.getElementById('optionB').value.trim();
-            const optionC = document.getElementById('optionC').value.trim();
-            const optionD = document.getElementById('optionD').value.trim();
-            const correctAnswer = document.getElementById('correctAnswer').value;
-
-            if (!questionText || !optionA || !optionB || !optionC || !optionD) {
-                alert('Please fill all fields');
-                return;
-            }
-
-            const newQuestion = {
-                question: questionText,
-                options: { A: optionA, B: optionB, C: optionC, D: optionD },
-                answer: correctAnswer
-            };
-
-            if (editingIndex >= 0) {
-                questions[editingIndex] = newQuestion;
-                editingIndex = -1;
-            } else {
-                questions.push(newQuestion);
-            }
-
-            if (await saveQuestionsToServer()) {
-                clearForm();
-                renderQuestions();
-            } else {
-                alert('Failed to save');
-            }
-        }
-
-        function editQuestion(index) {
-            const q = questions[index];
-            editingIndex = index;
-            document.getElementById('questionText').value = q.question;
-            document.getElementById('optionA').value = q.options.A;
-            document.getElementById('optionB').value = q.options.B;
-            document.getElementById('optionC').value = q.options.C;
-            document.getElementById('optionD').value = q.options.D;
-            document.getElementById('correctAnswer').value = q.answer;
-            document.getElementById('formTitle').textContent = '✏️ Edit Question';
-            document.getElementById('saveBtn').textContent = '💾 Update';
-            document.getElementById('cancelBtn').style.display = 'inline-block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         async function deleteQuestion(index) {
             if (!confirm('Delete this question?')) return;
 
-            // Backup just in case
-            const backup = [...questions];
-            questions.splice(index, 1);
+            const test = allTests.find(t => t.id === currentTestId);
+            if (!test || !test.questions) return;
 
-            if (await saveQuestionsToServer()) {
-                renderQuestions();
-            } else {
-                questions = backup; // Restore on failure
-                alert('Failed to delete question on server');
-                // renderQuestions(); // effectively re-renders original
+            test.questions.splice(index, 1);
+
+            await fetch(`${API_URL}/tests`, {
+                method: 'POST',
+                body: JSON.stringify(test)
+            });
+
+            renderQuestionsList(test.questions);
+        }
+
+        async function loadStudents() {
+            try {
+                const res = await fetch(`${API_URL}/students`);
+                const students = await res.json();
+                document.getElementById('studentsList').innerHTML = students.map(s => `
+                    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div>
+                            <div style="font-weight: 600; font-size: 1rem; color: #1f2937;">
+                                ${s.name} <span style="color: #6b7280; font-weight: 400; margin-left: 4px;">(${s.rollNumber || s.username})</span>
+                            </div>
+                        </div>
+                        <button type="button" onclick="deleteStudent('${s.rollNumber || s.id}', event)" 
+                            style="background: #ff5722; color: white; border: none; padding: 6px 16px; border-radius: 20px; font-weight: 500; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Error loading students", e);
+                document.getElementById('studentsList').innerHTML = '<div style="color:red">Error loading students</div>';
             }
         }
 
-        function cancelEdit() {
-            editingIndex = -1;
-            clearForm();
-        }
+        async function addStudent() {
+            const name = document.getElementById('newStudentName').value;
+            const roll = document.getElementById('newRoll').value;
 
-        function clearForm() {
-            ['questionText', 'optionA', 'optionB', 'optionC', 'optionD'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            document.getElementById('correctAnswer').value = 'A';
-            document.getElementById('formTitle').textContent = '➕ Add New Question';
-            document.getElementById('saveBtn').textContent = '💾 Save Question';
-            document.getElementById('cancelBtn').style.display = 'none';
-            editingIndex = -1;
-        }
+            if (!name || !roll) return alert('Name and Roll Number required');
 
-        async function generateWithAI() {
-            const topic = prompt("Enter topic for questions (e.g., Java Streams, OOP):", "Java");
-            if (!topic) return;
-
-            const count = prompt("How many questions?", "5");
-            if (!count) return;
-
-            if (!confirm(`Generate ${count} questions about ${topic}? This may take a few seconds.`)) return;
+            // Auto-generate credentials from Roll Number
+            // Username = Roll Number
+            // Password = Roll Number
+            const username = roll;
+            const password = roll;
 
             try {
-                const response = await fetch(getApiUrl('/api/generate'), {
+                const res = await fetch(`${API_URL}/students`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic, count: parseInt(count) })
+                    body: JSON.stringify({ rollNumber: roll, username, password, name })
                 });
 
-                const data = await response.json();
+                const data = await res.json();
 
-                if (data.success) {
-                    alert(data.message);
-                    loadQuestions(); // Reload to show new questions
-                } else {
-                    alert('Error: ' + data.message);
+                if (!data.success) {
+                    alert(data.message || 'Error adding student');
+                    return;
                 }
+
+                alert('Student added successfully!');
             } catch (e) {
-                alert('Failed to connect to AI service');
-            }
-        }
-
-        // === RESULTS ===
-        function sortResults(order) {
-            currentSortOrder = order;
-
-            // Update buttons
-            document.getElementById('sortAscBtn').className = `sort-btn ${order === 'asc' ? 'active' : ''}`;
-            document.getElementById('sortDescBtn').className = `sort-btn ${order === 'desc' ? 'active' : ''}`;
-
-            renderResults();
-        }
-
-        async function loadResults() {
-            try {
-                const response = await fetch(getApiUrl('/api/results'));
-                if (response.ok) {
-                    results = await response.json();
-                    renderResults();
-                }
-            } catch (e) {
-                console.error('Failed to load results:', e);
-                document.getElementById('resultsList').innerHTML = '<div class="empty-state">Failed to connect to server</div>';
-            }
-        }
-
-        function renderResults() {
-            const stats = results.statistics || {};
-            document.getElementById('statAttempts').textContent = stats.totalAttempts || 0;
-            document.getElementById('statAverage').textContent = stats.averageScore || 0;
-            document.getElementById('statHighest').textContent = stats.highestScore || 0;
-            document.getElementById('statLowest').textContent = stats.lowestScore || 0;
-
-            const container = document.getElementById('resultsList');
-            const list = results.results || [];
-
-            if (list.length === 0) {
-                container.innerHTML = '<div class="empty-state">No results yet</div>';
+                console.error(e);
+                alert('Connection error');
                 return;
             }
 
-            // Sort the list based on current sort order (by score)
-            const sortedList = [...list].sort((a, b) => {
-                // Sort by percentage/score
-                const scoreA = a.percentage || 0;
-                const scoreB = b.percentage || 0;
-                return currentSortOrder === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+            // Clear inputs
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newRoll').value = '';
+
+            loadStudents();
+        }
+
+        async function deleteStudent(roll) {
+            if (confirm('Remove student?')) {
+                await fetch(`${API_URL}/students?id=${roll}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
+
+        // --- Results Manager ---
+        let currentResultsData = [];
+
+        async function loadResults() {
+            try {
+                const res = await fetch(`${API_URL}/results`);
+                const data = await res.json();
+
+                // Update stats
+                document.getElementById('statAttempts').innerText = data.statistics.totalAttempts;
+                document.getElementById('statAvg').innerText = data.statistics.averageScore;
+                document.getElementById('statHigh').innerText = data.statistics.highestScore;
+                document.getElementById('statLow').innerText = data.statistics.lowestScore;
+
+                currentResultsData = data.results; // Cache for sorting
+                renderResults(currentResultsData);
+            } catch (e) {
+                console.error("Error loading results:", e);
+            }
+        }
+
+        function sortResults(order) {
+            if (!currentResultsData || currentResultsData.length === 0) return;
+
+            const sorted = [...currentResultsData].sort((a, b) => {
+                const scoreA = (a.score / a.total);
+                const scoreB = (b.score / b.total);
+                return order === 'desc' ? scoreB - scoreA : scoreA - scoreB;
             });
 
-            container.innerHTML = sortedList.map(r => {
-                const scoreClass = r.percentage >= 70 ? 'high' : (r.percentage >= 40 ? 'medium' : 'low');
-                return `
-                    <div class="result-item">
-                        <div class="result-header">
-                            <div>
-                                <span class="result-name">${r.name}</span>
-                                <span class="result-score ${scoreClass}">${r.score}/${r.total} (${r.percentage}%)</span>
-                            </div>
-                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" onclick="deleteResult('${r.id}')">✕</button>
-                        </div>
-                        <div class="result-meta">${r.date} at ${r.time}</div>
-                    </div>
-                `;
-            }).join('');
+            renderResults(sorted);
         }
 
-        async function deleteResult(id) {
-            if (!confirm('Delete this result?')) return;
+        async function clearResults() {
+            if (!confirm('Are you sure you want to delete ALL results? This cannot be undone.')) return;
+
             try {
-                const response = await fetch(getApiUrl(`/api/results?id=${id}`), { method: 'DELETE' });
-                if (response.ok) {
-                    loadResults(); // Reload list
+                const res = await fetch(`${API_URL}/results/clear`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    loadResults(); // Reload to clear UI
+                    alert('All results cleared.');
                 } else {
-                    alert('Failed to delete result');
+                    alert('Failed to clear results.');
                 }
             } catch (e) {
-                alert('Error connecting to server');
+                console.error("Error clearing results:", e);
+                alert('Connection error');
             }
         }
 
-        async function clearAllResults() {
-            if (!confirm('Clear ALL results? This cannot be undone.')) return;
-            try {
-                const response = await fetch(getApiUrl('/api/results/clear'), { method: 'POST' });
-                if (response.ok) {
-                    loadResults();
-                    alert('All results cleared');
-                }
-            } catch (e) {
-                alert('Failed to clear');
+        function renderResults(results) {
+            const list = document.getElementById('resultsList');
+            if (!results || results.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:#6b7280; padding:20px;">No results found.</div>';
+                return;
+            }
+
+            list.innerHTML = results.map(r => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                         <h3>${r.name}</h3>
+                         <div class="list-item-meta">${new Date(r.timestamp || Date.now()).toLocaleString()}</div>
+                    </div>
+                    <div>
+                         <span style="font-weight: 700; color: #10b981; font-size: 1.1rem;">${r.score}/${r.total} (${Math.round(r.score / r.total * 100)}%)</span>
+                         <button type="button" class="btn-delete" style="display:inline-flex; margin-left: 10px; width:28px; height:28px;" onclick="deleteResult('${r.id}', event)">×</button>
+                    </div>
+                </div>
+             `).join('');
+        }
+
+        async function deleteResult(id, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (confirm('Delete result?')) {
+                await fetch(`${API_URL}/results?id=${id}`, { method: 'DELETE' });
+                loadResults();
             }
         }
 
-        // Init
-        loadQuestions();
+        async function deleteStudent(roll, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (confirm('Remove student?')) {
+                await fetch(`${API_URL}/students?id=${roll}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
+
+        // --- Settings ---
+        async function loadSettings() {
+            const res = await fetch(`${API_URL}/settings`);
+            const data = await res.json();
+            document.getElementById('quizDuration').value = data.duration;
+        }
+
+        async function saveSettings() {
+            const dur = document.getElementById('quizDuration').value;
+            await fetch(`${API_URL}/settings`, {
+                method: 'POST',
+                body: JSON.stringify({ duration: parseInt(dur) })
+            });
+            alert('Settings saved');
+        }
+
+        // Initial Load
+        loadTests();
+        setDiff('easy');
     </script>
 </body>
 
